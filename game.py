@@ -32,16 +32,35 @@ import pygame, sys
 # Notes:
 #
 # should I allow the player to help kill enemies?
+# for the tower range, create an invisible rect around the tower
+
+#*************************************************************
+# bullet_list = [] 
+# bullet_delay = 0 
+# if bullet_delay == 0 and pressed[pygame.K_SPACE]:
+# 	bullet_list.append() 
+# 	bullet_delay = 20 
+
+# for bullet in bullet_list:
+# 	draw bullet 
+# 	update bullet 
+
+# bullet_delay = bullet_delay - 1 
+#
+#***************************************************************
+
 
 class Player(object): 
 
-	def __init__(self, body, colour, screen_width, screen_height): 
+	def __init__(self, body, colour, screen_width, screen_height, x, y): 
 		self.body = body
 		self.colour = colour
 		self.screen_width = screen_width
 		self.screen_height = screen_height  
+		self.horizontal_speed = x
+		self.vertical_speed = y
 
-	def update(self, x, y):
+	def update(self, x = 0, y = 0):
 
 		# Make sure the player can't leave the screen. 
 
@@ -121,17 +140,20 @@ class Tower(object):
 
 BLUE = (0, 128, 255)
 RED = (255, 51, 51)
+BLACK = (0, 0, 0)
+frame_rate = 30 
+tick_speed = 300 
 pygame.init() 
 
 width = 1024
 height = 768
 size = (width, height) 
-black = (0, 0, 0)
 screen = pygame.display.set_mode(size) 
 
 clock = pygame.time.Clock()
 
-player = Player(pygame.Rect((10, 10), (30, 30)), BLUE, width, height)
+player = Player(pygame.Rect((10, 10), (30, 30)), BLUE, width, height, 
+	tick_speed / frame_rate, tick_speed / frame_rate)
 
 enemy_list = [] 
 counter = 0
@@ -156,20 +178,20 @@ while True:
 
 	pressed = pygame.key.get_pressed()
 	if pressed[pygame.K_UP]:
-		player.update(0, -5)
+		player.update(y = -player.vertical_speed)
 	if pressed[pygame.K_DOWN]:
-		player.update(0, 5)
+		player.update(y = player.vertical_speed)
 	if pressed[pygame.K_LEFT]:
-		player.update(-5, 0)
+		player.update(x = -player.horizontal_speed)
 	if pressed[pygame.K_RIGHT]:
-		player.update(5, 0)
+		player.update(x = player.horizontal_speed)
 
 	if pressed[pygame.K_SPACE] and not shot_made:
 		bullet = Bullet((0, 10), 
 			(player.body.x, player.body.y), BLUE, height)
 		shot_made = 1 
 
-	screen.fill(black) 
+	screen.fill(BLACK) 
 	pygame.draw.rect(screen, player.colour, player.body)
 
 	# If the player made a shot draw the bullet
@@ -183,6 +205,7 @@ while True:
 
 	# Draw each enemy and move it
 	# If the enemy gets to the end of the screen remove it
+	# Put draw and remove in different loops
 	for enemy in enemy_list:
 		pygame.draw.rect(screen, enemy.colour, enemy.body)
 		enemy.update()
@@ -194,5 +217,5 @@ while True:
 				shot_made = 0
 
 	pygame.display.flip()
-	clock.tick(60)
+	clock.tick(frame_rate)
 	counter = counter + 1 
