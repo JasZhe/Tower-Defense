@@ -131,15 +131,19 @@ class Bullet(object):
 
 class Tower(object):
 
-    def __init__(self, pos, colour, max_range, damage, cost):
-        self.colour = colour 
-        self.max_range = max_range 
+    def __init__(self, pos, colour, max_range, damage, cost, size):
+        space_between = 40
+        self.type = colour # Each tower type will have a different colour  
+        self.max_range = max_range  # Range is the radius 
         self.damage = damage 
         self.cost = cost 
-
+        self.body = pygame.Rect(pos, size)
+        self.outer_body = pygame.Rect((pos[0] - self.body.width, pos[1] - self.body.height),
+            (self.body.width + space_between, self.body.height + space_between))
 
 BLUE = (0, 128, 255)
 RED = (255, 51, 51)
+GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 frame_rate = 30 
 tick_speed = 300 
@@ -163,6 +167,12 @@ enemy_speed = (3, 0)
 bullet_list = [] 
 last_shot = 0
 SHOT_DELAY = 500
+
+tower_list = [] 
+tower_damage = {GREEN : 5}
+tower_cost = {GREEN : 10}
+tower_size = {GREEN : (20, 20)}
+tower_range = {GREEN : 20}
 
 while True:
     for event in pygame.event.get():
@@ -193,8 +203,23 @@ while True:
             bullet_list.append(Bullet((0, 10),(player.body.x, player.body.y), BLUE, height))
             last_shot = now
 
+    if pressed[pygame.K_t]:
+        temp = Tower((player.body.x, player.body.y), GREEN, tower_range[GREEN], 
+            tower_damage[GREEN], tower_cost[GREEN], tower_size[GREEN])
+        placeable = 1 
+        for tower in tower_list:
+            if temp.body.colliderect(tower.outer_body):
+                placeable = 0
+                break
+        if placeable:
+            tower_list.append(temp)
+
+
     screen.fill(BLACK) 
     pygame.draw.rect(screen, player.colour, player.body)
+
+    for tower in tower_list:
+        pygame.draw.rect(screen, tower.type, tower.body)
 
     # If the player made a shot draw the bullet
     for bullet in bullet_list:
