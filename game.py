@@ -79,13 +79,14 @@ class Player(object):
 class Enemy(object):
 
         # Add health 
-        def __init__(self, body, colour, speed, screen_width, screen_height):
+        def __init__(self, body, colour, speed, screen_width, screen_height, hp = 100):
 
             self.body = body 
             self.speed = speed 
             self.colour = colour 
             self.screen_width = screen_width
-            self.screen_height = screen_height 
+            self.screen_height = screen_height
+            self.hp = hp
 
 
         def update(self):
@@ -93,10 +94,10 @@ class Enemy(object):
 
         # Return true if the enemy has left the screen 
         def check_destroy(self):
-            if self.body.right >= self.screen_width: 
-                return 1
+            if self.body.right >= self.screen_width or self.hp <= 0:
+                return True
             else:
-                return 0 
+                return False
 
 
 class Bullet(object):
@@ -114,9 +115,9 @@ class Bullet(object):
     # Return true if the bullet leaves the screen 
     def check_destroy(self):
         if self.body.bottom >= self.screen_height:
-            return 1
+            return True
         else:
-            return 0
+            return False
 
     # If the bullet hits an enemy, remove the enemy and return true
     # otherwise return false 
@@ -143,6 +144,7 @@ class Tower(object):
 
 BLUE = (0, 128, 255)
 RED = (255, 51, 51)
+ORANGE = (255, 153, 51)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 frame_rate = 30 
@@ -167,6 +169,7 @@ enemy_speed = (3, 0)
 bullet_list = [] 
 last_shot = 0
 SHOT_DELAY = 500
+SHOT_DMG = 25
 
 tower_list = [] 
 tower_damage = {GREEN : 5}
@@ -221,29 +224,47 @@ while True:
     for tower in tower_list:
         pygame.draw.rect(screen, tower.type, tower.body)
 
-    # If the player made a shot draw the bullet
-    for bullet in bullet_list:
-        pygame.draw.rect(screen, bullet.colour, bullet.body)
-        bullet.update()
+   
         # If the bullet leaves the screen then stop drawing the current bullet
         # and allow the player to make a new shot
     for bullet in bullet_list:
         if bullet.check_destroy():
             bullet_list.remove(bullet)
 
+     # If the bullet is still on screen, draw it
+    for bullet in bullet_list:
+        pygame.draw.rect(screen, bullet.colour, bullet.body)
+        bullet.update()
+
     # Draw each enemy and move it
     # If the enemy gets to the end of the screen remove it
     # Put draw and remove in different loops
     for enemy in enemy_list:
-        if enemy.check_destroy():
-            enemy_list.remove(enemy)
         for bullet in bullet_list:
             if bullet.body.colliderect(enemy.body):
-                enemy_list.remove(enemy)
+                enemy.hp = enemy.hp - SHOT_DMG
                 bullet_list.remove(bullet)
+
+        if enemy.check_destroy():
+            enemy_list.remove(enemy)
 
     for enemy in enemy_list:
         pygame.draw.rect(screen, enemy.colour, enemy.body)
+
+        # HP Bar
+        pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
+        #pygame.Rect((10, height / 2), (30, 30))
+
+        color = BLACK
+        if enemy.hp > 0:
+            if enemy.hp > 50:
+                colour = GREEN
+            elif enemy.hp > 30:
+                colour = ORANGE
+            else:
+                colour = RED
+       # pygame.draw.rect(gameDisplay, colour, [ship_X, ship_Y + shipSize - 5, shipSize * hp / 100, 8])
+        pygame.draw.rect(screen, colour, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / 100, 5])
         enemy.update()
 
     pygame.display.flip()
