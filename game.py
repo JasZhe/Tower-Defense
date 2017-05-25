@@ -161,16 +161,36 @@ clock = pygame.time.Clock()
 player = Player(pygame.Rect((10, 10), (30, 30)), BLUE, width, height, 
     tick_speed / frame_rate, tick_speed / frame_rate)
 
+# enemy stuff
 enemy_list = [] 
 counter = 0
 spawn_rate = 20
-enemy_speed = (3, 0)
+enemy_size = (30, 30)
+enemy_start = (10, height / 2)
 
+# Direction constants
+RATE = 3 
+RIGHT = (RATE, 0)
+LEFT = (-RATE, 0)
+UP = (0, -RATE)
+DOWN = (0, RATE) 
+enemy_speed = RIGHT
+
+# Enemy pathing
+turn_size = (45, 45)
+enemy_turn_list = [(pygame.Rect((width / 4, height / 2), turn_size), UP), 
+                   (pygame.Rect((width / 4, height / 8), turn_size), RIGHT),
+                   (pygame.Rect((width - width / 4, height / 8), turn_size), DOWN), 
+                   (pygame.Rect((width - width / 4, height - height / 4), turn_size), RIGHT)]
+
+# Bullet stuff 
 bullet_list = [] 
 last_shot = 0
 SHOT_DELAY = 500
 SHOT_DMG = 25
+bullet_speed = (0, 10)
 
+# Tower stuff 
 tower_list = [] 
 tower_damage = {GREEN : 5}
 tower_cost = {GREEN : 10}
@@ -186,9 +206,13 @@ while True:
     # ticks have passed an enemy will spawn. 
     if counter % spawn_rate == 0:
 
-        enemy_list.append(Enemy(pygame.Rect((10, height / 2), (30, 30)), RED, 
-            enemy_speed, width, height))
+        enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED, 
+        	enemy_speed, width, height))
 
+	for enemy in enemy_list:
+		for turn in enemy_turn_list:
+			if enemy.body.colliderect(turn[0]):
+				enemy.speed = turn[1]
 
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_UP]:
@@ -203,7 +227,7 @@ while True:
     if pressed[pygame.K_SPACE]:
         now = pygame.time.get_ticks()
         if now - last_shot >= SHOT_DELAY:
-            bullet_list.append(Bullet((0, 10),(player.body.x, player.body.y), BLUE, height))
+            bullet_list.append(Bullet(bullet_speed,(player.body.x, player.body.y), BLUE, height))
             last_shot = now
 
     if pressed[pygame.K_t]:
@@ -221,10 +245,14 @@ while True:
     screen.fill(BLACK) 
     pygame.draw.rect(screen, player.colour, player.body)
 
+    # This loop is just used to draw the blocks used to signal turns for the enemies
+    # comment out this loop when it's not needed anymore 
+    for turn in enemy_turn_list:
+        pygame.draw.rect(screen, GREEN, turn[0])
+
     for tower in tower_list:
         pygame.draw.rect(screen, tower.type, tower.body)
 
-   
         # If the bullet leaves the screen then stop drawing the current bullet
         # and allow the player to make a new shot
     for bullet in bullet_list:
