@@ -1,4 +1,5 @@
 import pygame, sys
+import math
 
 # Need to implement: 
 #
@@ -102,10 +103,10 @@ class Enemy(object):
 
 class Bullet(object):
 
-    def __init__(self, speed, pos, colour, screen_height):
+    def __init__(self, speed, pos, colour, screen_height, width = 5, height = 20):
         self.speed = speed
         # Inital position of the bullet ie. where the player made the shot 
-        self.body = pygame.Rect(pos, (5, 20))
+        self.body = pygame.Rect(pos, (width, height))
         self.colour = colour 
         self.screen_height = screen_height 
 
@@ -164,7 +165,7 @@ player = Player(pygame.Rect((10, 10), (30, 30)), BLUE, width, height,
 # enemy stuff
 enemy_list = [] 
 counter = 0
-spawn_rate = 20
+spawn_rate = 50
 enemy_size = (30, 30)
 enemy_start = (10, height / 2)
 
@@ -195,7 +196,11 @@ tower_list = []
 tower_damage = {GREEN : 5}
 tower_cost = {GREEN : 10}
 tower_size = {GREEN : (20, 20)}
-tower_range = {GREEN : 20}
+tower_range = {GREEN : 160}
+
+# Functions
+def distance (p1, p2):
+    return math.sqrt((p1[0] - p2[0])**2 +(p1[1] - p2[1])**2)
 
 while True:
     for event in pygame.event.get():
@@ -205,14 +210,13 @@ while True:
     # Every clock update the counter will increment by one, when spawn_rate
     # ticks have passed an enemy will spawn. 
     if counter % spawn_rate == 0:
+        enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED,
+                                enemy_speed, width, height))
 
-        enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED, 
-        	enemy_speed, width, height))
-
-	for enemy in enemy_list:
-		for turn in enemy_turn_list:
-			if enemy.body.colliderect(turn[0]):
-				enemy.speed = turn[1]
+    for enemy in enemy_list:
+        for turn in enemy_turn_list:
+            if enemy.body.colliderect(turn[0]):
+                enemy.speed = turn[1]
 
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_UP]:
@@ -227,7 +231,7 @@ while True:
     if pressed[pygame.K_SPACE]:
         now = pygame.time.get_ticks()
         if now - last_shot >= SHOT_DELAY:
-            bullet_list.append(Bullet(bullet_speed,(player.body.x, player.body.y), BLUE, height))
+            bullet_list.append(Bullet(bullet_speed,((2 * player.body.x + player.body.width)/2 - 5/2, player.body.y), BLUE, height))
             last_shot = now
 
     if pressed[pygame.K_t]:
@@ -248,10 +252,18 @@ while True:
     # This loop is just used to draw the blocks used to signal turns for the enemies
     # comment out this loop when it's not needed anymore 
     for turn in enemy_turn_list:
-        pygame.draw.rect(screen, GREEN, turn[0])
+        pygame.draw.rect(screen, ORANGE, turn[0])
 
     for tower in tower_list:
         pygame.draw.rect(screen, tower.type, tower.body)
+        # Tower range
+        tower_pos = (round((2 * tower.body.x + tower.body.width)/2) , round((2 * tower.body.y + tower.body.height)/2))
+        pygame.draw.circle(screen, GREEN, (round((2 * tower.body.x + tower.body.width)/2) ,round((2 * tower.body.y + tower.body.height)/2)), tower.max_range,1)
+        for enemy in enemy_list:
+            enemy_pos = ((2 * enemy.body.x + enemy.body.width)/2, (2 * enemy.body.y + enemy.body.height)/2)
+            if distance(tower_pos, enemy_pos) <= tower.max_range:
+                # draws line to indicate hit for now
+                pygame.draw.lines(screen, RED, False, [tower_pos, enemy_pos], 2)
 
         # If the bullet leaves the screen then stop drawing the current bullet
         # and allow the player to make a new shot
