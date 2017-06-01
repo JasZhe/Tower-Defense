@@ -1,15 +1,19 @@
 import pygame, sys
+from functions import *
 
 # A module of all classes in the game
 class Player(object): 
 
-    def __init__(self, body, colour, screen_width, screen_height, x, y): 
+    def __init__(self, body, colour, screen_width, screen_height, x, y, direction = "U", gun_size = 5, gun_colour = (255,255,0)): 
         self.body = body
         self.colour = colour
         self.screen_width = screen_width
         self.screen_height = screen_height  
         self.horizontal_speed = x
         self.vertical_speed = y
+        self.direction = direction
+        self.gun_size = gun_size
+        self.gun_colour = gun_colour
 
     def update(self, x = 0, y = 0):
 
@@ -25,6 +29,27 @@ class Player(object):
             self.body = self.body.move(x, 0)
         else:
             self.body = self.body.move(x, y)
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.colour, self.body)
+
+        if self.direction == "U":
+            pygame.draw.rect(screen, self.gun_colour, 
+                pygame.Rect(coord_add(self.body.topleft, ((self.body.width - self.gun_size)/2,  -self.gun_size)), 
+                    (self.gun_size, self.gun_size)))
+        elif self.direction == "D":
+            pygame.draw.rect(screen, self.gun_colour, 
+            pygame.Rect(coord_add(self.body.bottomleft, ((self.body.width - self.gun_size)/2,  0)), 
+                (self.gun_size, self.gun_size)))
+        elif self.direction == "L":
+            pygame.draw.rect(screen, self.gun_colour, 
+            pygame.Rect(coord_add(self.body.topleft, (-self.gun_size/2,  (self.body.height - self.gun_size)/2)), 
+                (self.gun_size, self.gun_size)))
+        else:
+            pygame.draw.rect(screen, self.gun_colour, 
+            pygame.Rect(coord_add(self.body.topright, (0,  (self.body.height - self.gun_size)/2)), 
+                (self.gun_size, self.gun_size)))
+
 
 
 class Enemy(object):
@@ -45,7 +70,7 @@ class Enemy(object):
 
         # Return true if the enemy has left the screen 
         def check_destroy(self):
-            if self.body.right >= self.screen_width or self.hp <= 0:
+            if self.body.left >= self.screen_width or self.hp <= 0:
                 return True
             else:
                 return False
@@ -69,17 +94,6 @@ class Bullet(object):
             return True
         else:
             return False
-
-    # If the bullet hits an enemy, remove the enemy and return true
-    # otherwise return false 
-    # def check_hit(self, enemy_list):
-    #   for enemy in enemy_list:
-    #       if self.body.colliderect(enemy.body):
-    #           enemy_list.remove(enemy)
-    #           print "hit"
-    #           return 1
-    #       else:
-    #           return 0
 
 class Tower(object):
 
