@@ -23,13 +23,13 @@ class Player(object):
         if ((self.body.right >= self.screen_width and x > 0) or 
             (self.body.x <= 0 and x < 0)):
 
-            self.body = self.body.move(0, y)
+            self.body.move_ip(0, y)
         elif ((self.body.bottom >= self.screen_height and y > 0) or 
             (self.body.y <= 0 and y < 0)):
 
-            self.body = self.body.move(x, 0)
+            self.body.move_ip(x, 0)
         else:
-            self.body = self.body.move(x, y)
+            self.body.move_ip(x, y)
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.colour, self.body)
@@ -56,7 +56,7 @@ class Player(object):
 class Enemy(object):
 
         # Add health 
-        def __init__(self, body, colour, speed, screen_width, screen_height, hp = 100):
+        def __init__(self, body, colour, speed, screen_width, screen_height, hp):
 
             self.body = body 
             self.speed = speed 
@@ -67,7 +67,7 @@ class Enemy(object):
 
 
         def update(self):
-            self.body = self.body.move(self.speed)
+            self.body.move_ip(self.speed)
 
         # Return true if the enemy has left the screen 
         def check_destroy(self):
@@ -87,7 +87,7 @@ class Bullet(object):
         self.screen_height = screen_height 
 
     def update(self):
-        self.body = self.body.move(self.speed) 
+        self.body.move_ip(self.speed) 
 
     # Return true if the bullet leaves the screen 
     def check_destroy(self):
@@ -106,20 +106,15 @@ class Tower(object):
         self.max_range = tower_range[self.type]  # Range is the radius 
         self.damage = tower_damage[self.type]
         self.cost = tower_cost[self.type] 
-        self.body = pygame.Rect(self.pos, tower_size[self.type])
-        # probably need to find a better way than to use an outer body to force spacing between
-        # towers possibly using the distance function instead
-        self.outer_body = pygame.Rect((self.pos[0] - self.body.width, self.pos[1] - self.body.height),
-            (self.body.width + space_between, self.body.height + space_between))
+        self.body = pygame.Rect(self.pos, INITIAL_SIZE)
+
 
     def upgrade(self):
         self.level = self.level + 1 
         self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
-        self.max_range = tower_range[self.type]  # Range is the radius 
+        self.max_range = tower_range[self.type]  # Range is the returnadius 
         self.damage = tower_damage[self.type]
         self.cost = tower_cost[self.type] 
-        self.body = pygame.Rect(self.pos, tower_size[self.type])
-        self.outer_body = pygame.Rect((self.pos[0] - self.body.width, self.pos[1] - self.body.height),
-            (self.body.width + space_between, self.body.height + space_between))
+        self.body.inflate_ip(tower_inflation[self.type])
 
 

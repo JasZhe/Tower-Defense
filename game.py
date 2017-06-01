@@ -59,13 +59,6 @@ player = Player(pygame.Rect((10, 10), (30, 30)), BLUE, WIDTH, HEIGHT,
 
 # enemy stuff
 enemy_list = [] 
-counter = 0
-spawn_rate = 50
-enemy_size = (30, 30)
-enemy_start = (10, HEIGHT / 2)
-
-
-enemy_speed = RIGHT
 
 # Enemy pathing
 turn_size = (45, 45)
@@ -84,6 +77,16 @@ bullet_speed = (bullet_speed_x, bullet_speed_y)
 # Tower stuff 
 # moved the tower stuff to properties 
 tower_list = [] 
+last_upgrade = 0 
+
+# testing stuff 
+spawn_increase_time = 0 
+spawn_decrease_time = 0
+increase_enemy_health_time = 0 
+myfont = pygame.font.SysFont("monospace", 15)
+label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_rate), 
+    1, (255, 255, 255))
+screen.blit(label, (100, 100))
 
 # Main Gameloop
 while True:
@@ -95,7 +98,7 @@ while True:
     # ticks have passed an enemy will spawn. 
     if counter % spawn_rate == 0:
         enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED,
-                                enemy_speed, WIDTH, HEIGHT))
+                                enemy_speed, WIDTH, HEIGHT, enemy_initial_hp))
 
     for enemy in enemy_list:
         for turn in enemy_turn_list:
@@ -138,7 +141,7 @@ while True:
         temp = Tower((player.body.x, player.body.y))
         placeable = 1 
         for tower in tower_list:
-            if temp.body.colliderect(tower.outer_body):
+            if distance(temp.body.center, tower.body.center) <= space_between: 
                 placeable = 0
                 break
         if placeable:
@@ -151,13 +154,57 @@ while True:
                 break
 
     if pressed[pygame.K_u]:
-        for tower in tower_list:
-            if player.body.colliderect(tower.body):
-                if tower.level < tower_max_level:
-                    tower.upgrade()
-                break
+        now = pygame.time.get_ticks()
+        if now - last_upgrade >= UPGRADE_DELAY: 
+            for tower in tower_list:
+                if player.body.colliderect(tower.body):
+                    if tower.level < tower_max_level:
+                        tower.upgrade()
+                        last_upgrade = now 
+                    break
+
+# ***************** TESTING COMMANDS ********************************
+
+    # increases spawn rate for testing purposes
+    if pressed[pygame.K_p]:
+        now = pygame.time.get_ticks()
+        if now - spawn_increase_time >= 100 and spawn_rate > 15:
+            spawn_rate = spawn_rate - 5
+            spawn_increase_time = now
+
+    # decreases spawn rate
+    if pressed[pygame.K_o]:
+        now = pygame.time.get_ticks()
+        if now - spawn_decrease_time >= 100 and spawn_rate < 200:
+            spawn_rate = spawn_rate + 5
+            spawn_decrease_time = now
+
+    # increase enemy health 
+    if pressed[pygame.K_h]:
+        now = pygame.time.get_ticks()
+        if now - increase_enemy_health_time >= 100 and enemy_initial_hp <= 500:
+            enemy_initial_hp = enemy_initial_hp + 5 
+            for enemy in enemy_list:
+                enemy.hp = enemy_initial_hp 
+            increase_enemy_health_time = now
+
+    # decrease enemy health 
+    if pressed[pygame.K_j]:
+        now = pygame.time.get_ticks()
+        if now - increase_enemy_health_time >= 100 and enemy_initial_hp >= 10:
+            enemy_initial_hp = enemy_initial_hp - 5 
+            for enemy in enemy_list:
+                enemy.hp = enemy_initial_hp 
+            increase_enemy_health_time = now
+
+    label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_rate), 
+        1, (255, 255, 255))
+
+# ***************** TESTING COMMANDS ********************************
+
 
     screen.fill(BLACK) 
+    screen.blit(label, (10, 10))
     
     # This loop is just used to draw the blocks used to signal turns for the enemies
     # comment out this loop when it's not needed anymore 

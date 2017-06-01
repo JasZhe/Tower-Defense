@@ -9,7 +9,7 @@ BLUE = (30, 144, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 MAGENTA = (255, 0, 255)
-DARK_BLUE = (0, 0, 128)
+DARK_BLUE = (0, 30, 205)
 CYAN = (0, 255, 255)
 
 # Timing constants 
@@ -37,10 +37,28 @@ DOWN = (0, RATE)
 
 # Tower upgrades 
 # added upgrade_list
-tower_max_level = 1 
-upgrade_list = [GREEN, CYAN]
-tower_damage = {GREEN : 0.5, CYAN : 1}
-tower_cost = {GREEN : 10, CYAN : 20}
-tower_size = {GREEN : (20, 20), CYAN : (30, 30)}
-tower_range = {GREEN : 160, CYAN : 170}
-space_between = 40
+tower_max_level = 7
+space_between = 70
+UPGRADE_DELAY = 300
+INITIAL_SIZE = (20, 20)
+upgrade_list = [GREEN, CYAN, BLUE, DARK_BLUE, YELLOW, ORANGE, MAGENTA, WHITE]
+
+tower_damage = {GREEN : 0.5, CYAN : 0.75, BLUE : 1, DARK_BLUE : 1.25, YELLOW : 1.5, ORANGE : 1.75,
+				MAGENTA : 2, WHITE : 2.25}
+
+tower_cost = {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORANGE : 40,
+				MAGENTA : 60, WHITE : 80}
+
+tower_inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
+			  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
+
+tower_range = {GREEN : 160, CYAN : 170, BLUE : 180, DARK_BLUE : 185, YELLOW : 190, ORANGE : 195,
+				MAGENTA : 200, WHITE : 210}
+
+# enemy stuff 
+counter = 0
+spawn_rate = 50
+enemy_size = (30, 30)
+enemy_start = (10, HEIGHT / 2)
+enemy_speed = RIGHT
+enemy_initial_hp = 100 
