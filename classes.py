@@ -1,5 +1,6 @@
 import pygame, sys
 from functions import *
+from properties import * 
 
 # A module of all classes in the game
 class Player(object): 
@@ -97,13 +98,28 @@ class Bullet(object):
 
 class Tower(object):
 
-    def __init__(self, pos, colour, max_range, damage, cost, size):
-        space_between = 40
-        self.type = colour # Each tower type will have a different colour  
-        self.max_range = max_range  # Range is the radius 
-        self.damage = damage 
-        self.cost = cost 
-        self.body = pygame.Rect(pos, size)
-        self.outer_body = pygame.Rect((pos[0] - self.body.width, pos[1] - self.body.height),
+    def __init__(self, pos):
+        # moved space_between to properties
+        self.pos = pos 
+        self.level = 0
+        self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
+        self.max_range = tower_range[self.type]  # Range is the radius 
+        self.damage = tower_damage[self.type]
+        self.cost = tower_cost[self.type] 
+        self.body = pygame.Rect(self.pos, tower_size[self.type])
+        # probably need to find a better way than to use an outer body to force spacing between
+        # towers possibly using the distance function instead
+        self.outer_body = pygame.Rect((self.pos[0] - self.body.width, self.pos[1] - self.body.height),
             (self.body.width + space_between, self.body.height + space_between))
+
+    def upgrade(self):
+        self.level = self.level + 1 
+        self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
+        self.max_range = tower_range[self.type]  # Range is the radius 
+        self.damage = tower_damage[self.type]
+        self.cost = tower_cost[self.type] 
+        self.body = pygame.Rect(self.pos, tower_size[self.type])
+        self.outer_body = pygame.Rect((self.pos[0] - self.body.width, self.pos[1] - self.body.height),
+            (self.body.width + space_between, self.body.height + space_between))
+
 

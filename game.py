@@ -10,16 +10,26 @@ from properties import *
 # collect resources or something that could randomly appear on the map 
 # in order to fill some sort of requirement to build a tower
 #
-# enemy health 
+# *DONE* enemy health
 #
-# a path that's not a straight line for the enemies to move in 
+# *DONE* a path that's not a straight line for the enemies to move in
 #
 # a timer for build time 
+#
+# player resources 
+#
+# tower build time 
+#
+# some way for the game to end, ie if a certain number of enemies pass through 
+#
+# variety of enemies
+#
+# enemies being able to kill the player and player has a death timer 
 #
 # *************************************************************
 # Extra ideas:
 # 
-# different towers
+# *DONE* different towers
 #
 # replace rects with sprites 
 #
@@ -38,19 +48,6 @@ from properties import *
 # for the tower range, create an invisible rect around the tower
 
 #*************************************************************
-# bullet_list = [] 
-# bullet_delay = 0 
-# if bullet_delay == 0 and pressed[pygame.K_SPACE]:
-#   bullet_list.append() 
-#   bullet_delay = 20 
-
-# for bullet in bullet_list:
-#   draw bullet 
-#   update bullet 
-
-# bullet_delay = bullet_delay - 1 
-#
-#***************************************************************
 
 
 pygame.init() 
@@ -85,11 +82,8 @@ bullet_speed_y = 20
 bullet_speed = (bullet_speed_x, bullet_speed_y)
 
 # Tower stuff 
+# moved the tower stuff to properties 
 tower_list = [] 
-tower_damage = {GREEN : 5}
-tower_cost = {GREEN : 10}
-tower_size = {GREEN : (20, 20)}
-tower_range = {GREEN : 160}
 
 # Main Gameloop
 while True:
@@ -134,15 +128,14 @@ while True:
                 h = SHOT_HEIGHT
             else:
                 w = SHOT_HEIGHT
-                h =SHOT_WIDTH
+                h = SHOT_WIDTH
             bullet_list.append(Bullet(bullet_speed, 
                 coord_add(player.body.center, (
                     -w/2, -h/2)), YELLOW, HEIGHT, w, h))
             last_shot = now
 
     if pressed[pygame.K_t]:
-        temp = Tower((player.body.x, player.body.y), GREEN, tower_range[GREEN], 
-            tower_damage[GREEN], tower_cost[GREEN], tower_size[GREEN])
+        temp = Tower((player.body.x, player.body.y))
         placeable = 1 
         for tower in tower_list:
             if temp.body.colliderect(tower.outer_body):
@@ -151,6 +144,18 @@ while True:
         if placeable:
             tower_list.append(temp)
 
+    if pressed[pygame.K_g]:
+        for tower in tower_list:
+            if player.body.colliderect(tower.body):
+                tower_list.remove(tower)
+                break
+
+    if pressed[pygame.K_u]:
+        for tower in tower_list:
+            if player.body.colliderect(tower.body):
+                if tower.level < tower_max_level:
+                    tower.upgrade()
+                break
 
     screen.fill(BLACK) 
     
@@ -164,18 +169,19 @@ while True:
         # Tower range
         tower_pos = (int(round((2 * tower.body.x + tower.body.width)/2) ), int(round((2 * tower.body.y + tower.body.height)/2)))
         pygame.draw.circle(screen, GREEN, (int(round((2 * tower.body.x + tower.body.width)/2)),
-            int(round((2 * tower.body.y + tower.body.height)/2))), tower.max_range,1)
+            int(round((2 * tower.body.y + tower.body.height)/2))), tower.max_range, 1)
 
         for enemy in enemy_list:
             enemy_pos = ((2 * enemy.body.x + enemy.body.width)/2, (2 * enemy.body.y + enemy.body.height)/2)
             if distance(tower_pos, enemy_pos) <= tower.max_range:
                 # draws line to indicate hit for now
                 pygame.draw.lines(screen, RED, False, [tower_pos, enemy_pos], 2)
-                enemy.hp = enemy.hp - 0.75
+                # now based on the tower damage specified in the properties file 
+                enemy.hp = enemy.hp - tower.damage
                 break
 
-        # If the bullet leaves the screen then stop drawing the current bullet
-        # and allow the player to make a new shot
+    # If the bullet leaves the screen then stop drawing the current bullet
+    # and allow the player to make a new shot
     for bullet in bullet_list:
         if bullet.check_destroy():
             bullet_list.remove(bullet)
