@@ -56,7 +56,7 @@ class Player(object):
 class Enemy(object):
 
         # Add health 
-        def __init__(self, body, colour, speed, screen_width, screen_height, hp):
+        def __init__(self, body, colour, speed, screen_width, screen_height, hp, max_hp = 100):
 
             self.body = body 
             self.speed = speed 
@@ -64,12 +64,13 @@ class Enemy(object):
             self.screen_width = screen_width
             self.screen_height = screen_height
             self.hp = hp
+            self.max_hp = max_hp
 
 
         def update(self):
             self.body.move_ip(self.speed)
 
-        # Return true if the enemy has left the screen 
+        # Return true if the enemy has left the screen or destroyed
         def check_destroy(self):
             if self.body.left >= self.screen_width or self.hp <= 0:
                 return True
@@ -98,15 +99,18 @@ class Bullet(object):
 
 class Tower(object):
 
-    def __init__(self, pos):
+    def __init__(self, pos, shellSpeed = 120, reload = 15):
         # moved space_between to properties
         self.pos = pos 
         self.level = 0
         self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
         self.max_range = tower_range[self.type]  # Range is the radius 
         self.damage = tower_damage[self.type]
+        self.shellSpeed = shellSpeed
         self.cost = tower_cost[self.type] 
         self.body = pygame.Rect(self.pos, INITIAL_SIZE)
+        self.reload = reload
+        self.time = 0
 
 
     def upgrade(self):
@@ -116,5 +120,14 @@ class Tower(object):
         self.damage = tower_damage[self.type]
         self.cost = tower_cost[self.type] 
         self.body.inflate_ip(tower_inflation[self.type])
+
+    # shoots at enemy when time is right
+    def canShoot(self):
+        if self.time % self.reload == 0:
+            self.time = 0
+            return True
+        else:
+            return False
+
 
 

@@ -18,9 +18,12 @@ from properties import *
 #
 # player resources 
 #
-# tower build time 
+# tower build time -nah?
+#
+# towet build cost
 #
 # some way for the game to end, ie if a certain number of enemies pass through 
+#       Base HP: each enemy that breaks through reduces it
 #
 # variety of enemies
 #
@@ -30,6 +33,8 @@ from properties import *
 # Extra ideas:
 # 
 # *DONE* different towers
+#
+# Different types of towers (Fast shooting, slow shooting, splash damage, slow enemy)
 #
 # replace rects with sprites 
 #
@@ -46,6 +51,7 @@ from properties import *
 #
 # should I allow the player to help kill enemies?
 # for the tower range, create an invisible rect around the tower
+#       Circle is better * DONE
 
 #*************************************************************
 
@@ -69,6 +75,7 @@ enemy_turn_list = [(pygame.Rect((WIDTH / 4, HEIGHT / 2), turn_size), UP),
 
 # Bullet stuff 
 bullet_list = [] 
+tower_bullets = []
 last_shot = 0
 bullet_speed_x = 0
 bullet_speed_y = 20
@@ -92,13 +99,14 @@ screen.blit(label, (100, 100))
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
+            pygame.quit()
             sys.exit() 
 
     # Every clock update the counter will increment by one, when spawn_rate
     # ticks have passed an enemy will spawn. 
     if counter % spawn_rate == 0:
         enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED,
-                                enemy_speed, WIDTH, HEIGHT, enemy_initial_hp))
+                                enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp))
 
     for enemy in enemy_list:
         for turn in enemy_turn_list:
@@ -183,7 +191,8 @@ while True:
     if pressed[pygame.K_h]:
         now = pygame.time.get_ticks()
         if now - increase_enemy_health_time >= 100 and enemy_initial_hp <= 500:
-            enemy_initial_hp = enemy_initial_hp + 5 
+            enemy_initial_hp = enemy_initial_hp + 5
+            enemy_max_hp = enemy_max_hp + 5
             for enemy in enemy_list:
                 enemy.hp = enemy_initial_hp 
             increase_enemy_health_time = now
@@ -213,20 +222,32 @@ while True:
 
     for tower in tower_list:
         pygame.draw.rect(screen, tower.type, tower.body)
-        # Tower range
-        tower_pos = (int(round((2 * tower.body.x + tower.body.width)/2) ), int(round((2 * tower.body.y + tower.body.height)/2)))
-        pygame.draw.circle(screen, GREEN, (int(round((2 * tower.body.x + tower.body.width)/2)),
-            int(round((2 * tower.body.y + tower.body.height)/2))), tower.max_range, 1)
+        
+        # view range only when player is in range
+        if distance(tower.body.center, player.body.center) <= tower.max_range:
+            pygame.draw.circle(screen, GREEN, tower.body.center, tower.max_range, 1)
 
+        # Tower range
         for enemy in enemy_list:
-            enemy_pos = ((2 * enemy.body.x + enemy.body.width)/2, (2 * enemy.body.y + enemy.body.height)/2)
-            if distance(tower_pos, enemy_pos) <= tower.max_range:
+            if distance(tower.body.center, enemy.body.center) <= tower.max_range:
                 # draws line to indicate hit for now
-                pygame.draw.lines(screen, RED, False, [tower_pos, enemy_pos], 2)
+                pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
+
+                if tower.canShoot():
+                    angle = math.atan(coord_subtract(enemy.body.center, tower.body.center)[1] 
+                        / coord_subtract(enemy.body.center, tower.body.center)[0])
+                    tower_bullets.append(
+                        Bullet((60*math.cos(angle), 60*math.sin(angle)),
+                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
+
                 # now based on the tower damage specified in the properties file 
                 enemy.hp = enemy.hp - tower.damage
                 break
+        tower.time += 1
 
+    for bullet in tower_bullets:
+        pygame.draw.rect(screen, bullet.colour, bullet.body)
+        bullet.update()
     # If the bullet leaves the screen then stop drawing the current bullet
     # and allow the player to make a new shot
     for bullet in bullet_list:
@@ -255,6 +276,10 @@ while True:
     for enemy in enemy_list:
         pygame.draw.rect(screen, enemy.colour, enemy.body)
 
+        # Enemy info
+        screen.blit(myfont.render("HP: %d/%d" % (enemy.hp, enemy.max_hp), 
+            1, (255, 255, 255)), enemy.body.bottomleft)
+
         # HP Bar
         pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
         #pygame.Rect((10, height / 2), (30, 30))
@@ -268,7 +293,8 @@ while True:
             else:
                 colour = RED
        # pygame.draw.rect(gameDisplay, colour, [ship_X, ship_Y + shipSize - 5, shipSize * hp / 100, 8])
-        pygame.draw.rect(screen, colour, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / 100, 5])
+        pygame.draw.rect(screen, colour, 
+            [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
         enemy.update()
 
     pygame.display.update()
