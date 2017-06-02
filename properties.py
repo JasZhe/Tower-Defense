@@ -62,3 +62,4 @@ enemy_size = (30, 30)
 enemy_start = (10, HEIGHT / 2)
 enemy_speed = RIGHT
 enemy_initial_hp = 100 
+enemy_max_hp = 100
