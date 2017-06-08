@@ -57,7 +57,7 @@ tower_range = {GREEN : 160, CYAN : 170, BLUE : 180, DARK_BLUE : 185, YELLOW : 19
 
 # enemy stuff 
 counter = 0
-spawn_rate = 50
+spawn_time = 50
 enemy_size = (30, 30)
 enemy_start = (10, HEIGHT / 2)
 enemy_speed = RIGHT

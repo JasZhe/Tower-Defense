@@ -59,7 +59,7 @@ class Enemy(object):
         def __init__(self, body, colour, speed, screen_width, screen_height, hp, max_hp = 100):
 
             self.body = body 
-            self.speed = speed 
+            self.speed = speed # Tuple (v_x, v_y)
             self.colour = colour 
             self.screen_width = screen_width
             self.screen_height = screen_height
@@ -99,7 +99,7 @@ class Bullet(object):
 
 class Tower(object):
 
-    def __init__(self, pos, shellSpeed = 120, reload = 15):
+    def __init__(self, pos, shellSpeed = 10, reload = 15):
         # moved space_between to properties
         self.pos = pos 
         self.level = 0

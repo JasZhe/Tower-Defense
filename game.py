@@ -91,7 +91,7 @@ spawn_increase_time = 0
 spawn_decrease_time = 0
 increase_enemy_health_time = 0 
 myfont = pygame.font.SysFont("monospace", 15)
-label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_rate), 
+label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_time), 
     1, (255, 255, 255))
 screen.blit(label, (100, 100))
 
@@ -102,9 +102,9 @@ while True:
             pygame.quit()
             sys.exit() 
 
-    # Every clock update the counter will increment by one, when spawn_rate
+    # Every clock update the counter will increment by one, when spawn_time
     # ticks have passed an enemy will spawn. 
-    if counter % spawn_rate == 0:
+    if counter % spawn_time == 0:
         enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED,
                                 enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp))
 
@@ -176,15 +176,15 @@ while True:
     # increases spawn rate for testing purposes
     if pressed[pygame.K_p]:
         now = pygame.time.get_ticks()
-        if now - spawn_increase_time >= 100 and spawn_rate > 15:
-            spawn_rate = spawn_rate - 5
+        if now - spawn_increase_time >= 100 and spawn_time > 15:
+            spawn_time = spawn_time - 5
             spawn_increase_time = now
 
     # decreases spawn rate
     if pressed[pygame.K_o]:
         now = pygame.time.get_ticks()
-        if now - spawn_decrease_time >= 100 and spawn_rate < 200:
-            spawn_rate = spawn_rate + 5
+        if now - spawn_decrease_time >= 100 and spawn_time < 200:
+            spawn_time = spawn_time + 5
             spawn_decrease_time = now
 
     # increase enemy health 
@@ -206,7 +206,7 @@ while True:
                 enemy.hp = enemy_initial_hp 
             increase_enemy_health_time = now
 
-    label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_rate), 
+    label = myfont.render("Health: %d Spawn Time: %d" % (enemy_initial_hp, spawn_time), 
         1, (255, 255, 255))
 
 # ***************** TESTING COMMANDS ********************************
@@ -234,11 +234,19 @@ while True:
                 pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
 
                 if tower.canShoot():
-                    angle = math.atan(coord_subtract(enemy.body.center, tower.body.center)[1] 
-                        / coord_subtract(enemy.body.center, tower.body.center)[0])
-                    tower_bullets.append(
-                        Bullet((60*math.cos(angle), 60*math.sin(angle)),
-                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
+                    #if enemy.body.x - tower.body.x == 0:
+
+                    c = (enemy.body.center[1] - tower.body.center[1]) * 1.0 / (enemy.body.center[0] - tower.body.center[0])
+                    if enemy.speed[0] == 0: 
+                        angle = math.acos(-enemy.speed[1] * 1.0 / (tower.shellSpeed * math.sqrt(1.0 + c**2))) / 2.0
+
+
+                    #if (c > 0 and coord_subtract(enemy.body.center, tower.body.center)[1] < 0) or (c < 0 and coord_subtract(enemy.body.center, tower.body.center)[1] > 0):
+                    #    angle += math.pi
+
+                        tower_bullets.append(
+                            Bullet((tower.shellSpeed*math.cos(angle), tower.shellSpeed*math.sin(angle)),
+                             tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
 
                 # now based on the tower damage specified in the properties file 
                 enemy.hp = enemy.hp - tower.damage
