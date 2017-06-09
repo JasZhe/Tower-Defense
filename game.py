@@ -144,6 +144,8 @@ while True:
                 coord_add(player.body.center, (
                     -w/2, -h/2)), YELLOW, HEIGHT, w, h))
             last_shot = now
+            #bullet_speed = (bullet_speed[0] + 0.1, bullet_speed[1])
+           # print(bullet_speed)
 
     if pressed[pygame.K_t]:
         temp = Tower((player.body.x, player.body.y))
@@ -235,23 +237,24 @@ while True:
 
                 if tower.canShoot():
                     #if enemy.body.x - tower.body.x == 0:
-
                     c = (enemy.body.center[1] - tower.body.center[1]) * 1.0 / (enemy.body.center[0] - tower.body.center[0])
                     if enemy.speed[0] == 0: 
-                        angle = math.acos(-enemy.speed[1] * 1.0 / (tower.shellSpeed * math.sqrt(1.0 + c**2))) / 2.0
-
-
-                    #if (c > 0 and coord_subtract(enemy.body.center, tower.body.center)[1] < 0) or (c < 0 and coord_subtract(enemy.body.center, tower.body.center)[1] > 0):
-                    #    angle += math.pi
-
+                        angle = math.acos(-enemy.speed[1] * 1.0 / (tower.shellSpeed * math.sqrt(1.0 + c * c))) - math.atan(1/c)
+                        if (c > 0 and enemy.body.center[1] - tower.body.center[1] <= 0) or \
+                            (c < 0 and enemy.body.center[1] - tower.body.center[1] <= 0):
+                            angle += math.pi
                         tower_bullets.append(
                             Bullet((tower.shellSpeed*math.cos(angle), tower.shellSpeed*math.sin(angle)),
                              tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
 
                 # now based on the tower damage specified in the properties file 
-                enemy.hp = enemy.hp - tower.damage
+                #enemy.hp = enemy.hp - tower.damage
                 break
         tower.time += 1
+
+    for bullet in tower_bullets:
+        if bullet.check_destroy():
+            tower_bullets.remove(bullet)
 
     for bullet in tower_bullets:
         pygame.draw.rect(screen, bullet.colour, bullet.body)
@@ -277,10 +280,16 @@ while True:
             if bullet.body.colliderect(enemy.body):
                 enemy.hp = enemy.hp - SHOT_DMG
                 bullet_list.remove(bullet)
+        for bullet in tower_bullets:
+            if bullet.body.colliderect(enemy.body):
+                enemy.hp = enemy.hp - tower.damage
+                tower_bullets.remove(bullet)
 
         if enemy.check_destroy():
             enemy_list.remove(enemy)
 
+
+    # Draw enemy if still alive at the end of the frame
     for enemy in enemy_list:
         pygame.draw.rect(screen, enemy.colour, enemy.body)
 
