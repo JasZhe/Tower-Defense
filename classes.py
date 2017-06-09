@@ -99,7 +99,7 @@ class Bullet(object):
 
 class Tower(object):
 
-    def __init__(self, pos, shellSpeed = 30, reload = 30):
+    def __init__(self, pos, shellSpeed = 8, reload = 8):
         # moved space_between to properties
         self.pos = pos 
         self.level = 0

@@ -240,8 +240,13 @@ while True:
                     c = (enemy.body.center[1] - tower.body.center[1]) * 1.0 / (enemy.body.center[0] - tower.body.center[0])
                     if enemy.speed[0] == 0: 
                         angle = math.acos(-enemy.speed[1] * 1.0 / (tower.shellSpeed * math.sqrt(1.0 + c * c))) - math.atan(1/c)
+
+                        
+                        # CAST rule accomodation
                         if (c > 0 and enemy.body.center[1] - tower.body.center[1] <= 0) or \
                             (c < 0 and enemy.body.center[1] - tower.body.center[1] <= 0):
+
+
                             angle += math.pi
                         tower_bullets.append(
                             Bullet((tower.shellSpeed*math.cos(angle), tower.shellSpeed*math.sin(angle)),
