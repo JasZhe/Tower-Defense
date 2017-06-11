@@ -43,6 +43,69 @@ UPGRADE_DELAY = 300
 INITIAL_SIZE = (20, 20)
 upgrade_list = [GREEN, CYAN, BLUE, DARK_BLUE, YELLOW, ORANGE, MAGENTA, WHITE]
 
+
+rifle_stats = {
+	"damage" : {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
+					MAGENTA : 55, WHITE : 60},
+
+	"cost" : {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORANGE : 40,
+					MAGENTA : 60, WHITE : 80},
+
+	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
+				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
+
+	"range" : {GREEN : 180, CYAN : 190, BLUE : 200, DARK_BLUE : 210, YELLOW : 220, ORANGE : 230,
+					MAGENTA : 240, WHITE : 250},
+
+	"reload": 30,
+
+
+	"shell_speed": 20
+}
+
+sniper_stats = {
+	"damage" : {GREEN : 80, CYAN : 90, BLUE : 100, DARK_BLUE : 120, YELLOW : 140, ORANGE : 160,
+					MAGENTA : 180, WHITE : 200},
+
+	"cost" : {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
+					MAGENTA : 600, WHITE : 800},
+
+	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
+				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
+
+	"range" : {GREEN : 240, CYAN : 260, BLUE : 280, DARK_BLUE : 300, YELLOW : 310, ORANGE : 320,
+					MAGENTA : 330, WHITE : 340},
+
+	"reload": 90,
+
+
+	"shell_speed": 30
+
+}
+
+machine_gun_stats = {
+	"damage" : {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 25, ORANGE : 30,
+					MAGENTA : 35, WHITE : 40},
+
+	"cost" : {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
+					MAGENTA : 600, WHITE : 800},
+
+	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
+				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
+
+	"range" : {GREEN : 160, CYAN : 170, BLUE : 180, DARK_BLUE : 190, YELLOW : 200, ORANGE : 210,
+					MAGENTA : 220, WHITE : 230},
+
+	"reload": 4,
+	
+
+	"shell_speed": 15
+
+}
+
+
+tower_classes = {"rifle": rifle_stats, "sniper": sniper_stats, "machine_gun": machine_gun_stats, "heavy": 4}
+
 tower_damage = {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
 				MAGENTA : 55, WHITE : 60}
 
@@ -52,8 +115,8 @@ tower_cost = {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORAN
 tower_inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
 			  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
 
-tower_range = {GREEN : 160, CYAN : 170, BLUE : 180, DARK_BLUE : 185, YELLOW : 190, ORANGE : 195,
-				MAGENTA : 200, WHITE : 210}
+tower_range = {GREEN : 180, CYAN : 190, BLUE : 200, DARK_BLUE : 210, YELLOW : 220, ORANGE : 230,
+				MAGENTA : 240, WHITE : 250}
 
 # enemy stuff 
 counter = 0
