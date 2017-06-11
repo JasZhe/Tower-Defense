@@ -80,12 +80,13 @@ class Enemy(object):
 
 class Bullet(object):
 
-    def __init__(self, speed, pos, colour, screen_height, width = 5, height = 20):
+    def __init__(self, speed, pos, colour, screen_height, width = 5, height = 20, damage = 10):
         self.speed = speed
         # Inital position of the bullet ie. where the player made the shot 
         self.body = pygame.Rect(pos, (width, height))
         self.colour = colour 
         self.screen_height = screen_height 
+        self.damage = damage
 
     def update(self):
         self.body.move_ip(self.speed) 
@@ -100,28 +101,29 @@ class Bullet(object):
 class Tower(object):
 
 
-    def __init__(self, pos, shellSpeed = 20, reload = 30):
+    def __init__(self, pos, tower_class = "rifle"):
         # moved space_between to properties
         # shellSpeed should be >= 10, anything smaller will create rounding inaccuracies
         self.pos = pos 
         self.level = 0
+        self.tower_class = tower_class      
         self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
-        self.max_range = tower_range[self.type]  # Range is the radius 
-        self.damage = tower_damage[self.type]
-        self.shellSpeed = shellSpeed
-        self.cost = tower_cost[self.type] 
+        self.max_range = tower_classes[self.tower_class]["range"][self.type]  # Range is the radius 
+        self.damage = tower_classes[self.tower_class]["damage"][self.type]
+        self.cost = tower_classes[self.tower_class]["damage"][self.type]
         self.body = pygame.Rect(self.pos, INITIAL_SIZE)
-        self.reload = reload
+        self.reload = tower_classes[self.tower_class]["reload"]
+        self.shell_speed = tower_classes[self.tower_class]["shell_speed"]
         self.time = 0
 
 
     def upgrade(self):
-        self.level = self.level + 1 
+        self.level = self.level + 1         
         self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
-        self.max_range = tower_range[self.type]  # Range is the returnadius 
-        self.damage = tower_damage[self.type]
-        self.cost = tower_cost[self.type] 
-        self.body.inflate_ip(tower_inflation[self.type])
+        self.max_range = tower_classes[self.tower_class]["range"][self.type]  # Range is the radius 
+        self.damage = tower_classes[self.tower_class]["damage"][self.type]
+        self.cost = tower_classes[self.tower_class]["damage"][self.type]
+        self.body.inflate_ip(tower_classes[self.tower_class]["inflation"][self.type])
 
     # shoots at enemy when time is right
     def canShoot(self):
@@ -130,6 +132,10 @@ class Tower(object):
             return True
         else:
             return False
+
+    # Calculates damage rate (Damage Per Frame)
+    def dpm (self):
+        return self.damage / self.reload
 
 
 

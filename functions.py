@@ -28,6 +28,7 @@ def quadrant (p1, p2):
 			return 2
 		else:
 			return 3
+			
 # Quadratic formula
 # 1st element for + root
 # 2nd element for - root

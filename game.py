@@ -57,6 +57,11 @@ from properties import *
 
 
 pygame.init() 
+
+# Mixer is for sounds
+pygame.mixer.pre_init(44100, -16, 2, 2048)
+pygame.mixer.init()
+
 screen = pygame.display.set_mode(SIZE) 
 clock = pygame.time.Clock()
 
@@ -94,6 +99,18 @@ myfont = pygame.font.SysFont("monospace", 15)
 label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_time), 
     1, (255, 255, 255))
 screen.blit(label, (100, 100))
+
+# Sounds
+rifle_gun = pygame.mixer.Sound(file="sounds/rifle_gun.wav")
+sniper_gun = pygame.mixer.Sound(file="sounds/sniper_gun.wav")
+machine_gun = pygame.mixer.Sound(file="sounds/machine_gun.wav")
+player_gun = pygame.mixer.Sound(file="sounds/player_gun.wav")
+
+tower_sounds = {
+    "rifle" : rifle_gun,
+    "sniper" : sniper_gun,
+    "machine_gun" : machine_gun
+}
 
 # Main Gameloop
 while True:
@@ -134,6 +151,7 @@ while True:
     if pressed[pygame.K_SPACE]:
         now = pygame.time.get_ticks()
         if now - last_shot >= SHOT_DELAY:
+            pygame.mixer.Sound.play(player_gun)
             if player.direction == "U" or player.direction == "D":
                 w = SHOT_WIDTH
                 h = SHOT_HEIGHT
@@ -148,7 +166,15 @@ while True:
            # print(bullet_speed)
 
     if pressed[pygame.K_t]:
-        temp = Tower((player.body.x, player.body.y))
+        rand = random.randint(0,2)
+        if rand == 0:
+            tower_class = "rifle"
+        elif rand == 1:
+            tower_class = "sniper"
+        elif rand == 2:
+            tower_class = "machine_gun"
+
+        temp = Tower((player.body.x, player.body.y),tower_class)
         placeable = 1 
         for tower in tower_list:
             if distance(temp.body.center, tower.body.center) <= space_between: 
@@ -236,6 +262,7 @@ while True:
                 pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
 
                 if tower.canShoot():
+                    pygame.mixer.Sound.play(tower_sounds[tower.tower_class])
                     dx = enemy.body.center[0] - tower.body.center[0]
                     dy = enemy.body.center[1] - tower.body.center[1]
                     quad = quadrant(tower.body, enemy.body)
@@ -243,12 +270,12 @@ while True:
                     # Vertical Case
                     if enemy.speed[0] == 0:
                         # Quadratic formula to calculate impact time
-                        time = quadratic_formula((enemy.speed[1]**2 - tower.shellSpeed**2), 2.0*enemy.speed[1]*dy, dx**2 + dy**2)[1]
-                        beta = math.acos(abs(dx / (tower.shellSpeed * time)))
+                        time = quadratic_formula((enemy.speed[1]**2 - tower.shell_speed**2), 2.0*enemy.speed[1]*dy, dx**2 + dy**2)[1]
+                        beta = math.acos(abs(dx / (tower.shell_speed * time)))
                     # Horizontal Case
                     else:
-                        time = quadratic_formula((enemy.speed[0]**2 - tower.shellSpeed**2), 2.0*enemy.speed[0]*dx, dx**2 + dy**2)[1]
-                        beta = math.asin(abs(dy / (tower.shellSpeed * time)))
+                        time = quadratic_formula((enemy.speed[0]**2 - tower.shell_speed**2), 2.0*enemy.speed[0]*dx, dx**2 + dy**2)[1]
+                        beta = math.asin(abs(dy / (tower.shell_speed * time)))
 
                     # CAST rule accomodations
                     if quad == 1:
@@ -260,16 +287,16 @@ while True:
                     else:
                         angle = 2.0 * math.pi - beta
 
-                    # If you want some inaccuracy to some towers (eg. machine guns, uncomment the next two lines)
-                    # dispersion = random.randint(-10, 10) / 100.0
-                    # angle += dispersion
+                    if tower.tower_class == "machine_gun":
+                        dispersion = random.randint(-12, 12) / 100.0
+                        angle += dispersion
 
 
 
 
                     tower_bullets.append(
-                        Bullet((tower.shellSpeed * math.cos(angle), tower.shellSpeed * math.sin(angle)),
-                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
+                        Bullet((tower.shell_speed * math.cos(angle), tower.shell_speed * math.sin(angle)),
+                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5, damage = tower.damage))
                              
                 # now based on the tower damage specified in the properties file 
                 #enemy.hp = enemy.hp - tower.damage
@@ -306,7 +333,7 @@ while True:
                 bullet_list.remove(bullet)
         for bullet in tower_bullets:
             if bullet.body.colliderect(enemy.body):
-                enemy.hp = enemy.hp - tower.damage
+                enemy.hp = enemy.hp - bullet.damage
                 tower_bullets.remove(bullet)
 
         if enemy.check_destroy():
