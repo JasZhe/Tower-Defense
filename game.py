@@ -91,7 +91,7 @@ spawn_increase_time = 0
 spawn_decrease_time = 0
 increase_enemy_health_time = 0 
 myfont = pygame.font.SysFont("monospace", 15)
-label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_rate), 
+label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_time), 
     1, (255, 255, 255))
 screen.blit(label, (100, 100))
 
@@ -102,9 +102,9 @@ while True:
             pygame.quit()
             sys.exit() 
 
-    # Every clock update the counter will increment by one, when spawn_rate
+    # Every clock update the counter will increment by one, when spawn_time
     # ticks have passed an enemy will spawn. 
-    if counter % spawn_rate == 0:
+    if counter % spawn_time == 0:
         enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED,
                                 enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp))
 
@@ -144,6 +144,8 @@ while True:
                 coord_add(player.body.center, (
                     -w/2, -h/2)), YELLOW, HEIGHT, w, h))
             last_shot = now
+            #bullet_speed = (bullet_speed[0] + 0.1, bullet_speed[1])
+           # print(bullet_speed)
 
     if pressed[pygame.K_t]:
         temp = Tower((player.body.x, player.body.y))
@@ -176,15 +178,15 @@ while True:
     # increases spawn rate for testing purposes
     if pressed[pygame.K_p]:
         now = pygame.time.get_ticks()
-        if now - spawn_increase_time >= 100 and spawn_rate > 15:
-            spawn_rate = spawn_rate - 5
+        if now - spawn_increase_time >= 100 and spawn_time > 15:
+            spawn_time = spawn_time - 5
             spawn_increase_time = now
 
     # decreases spawn rate
     if pressed[pygame.K_o]:
         now = pygame.time.get_ticks()
-        if now - spawn_decrease_time >= 100 and spawn_rate < 200:
-            spawn_rate = spawn_rate + 5
+        if now - spawn_decrease_time >= 100 and spawn_time < 200:
+            spawn_time = spawn_time + 5
             spawn_decrease_time = now
 
     # increase enemy health 
@@ -206,7 +208,7 @@ while True:
                 enemy.hp = enemy_initial_hp 
             increase_enemy_health_time = now
 
-    label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_rate), 
+    label = myfont.render("Health: %d Spawn Time: %d" % (enemy_initial_hp, spawn_time), 
         1, (255, 255, 255))
 
 # ***************** TESTING COMMANDS ********************************
@@ -234,16 +236,49 @@ while True:
                 pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
 
                 if tower.canShoot():
-                    angle = math.atan(coord_subtract(enemy.body.center, tower.body.center)[1] 
-                        / coord_subtract(enemy.body.center, tower.body.center)[0])
-                    tower_bullets.append(
-                        Bullet((60*math.cos(angle), 60*math.sin(angle)),
-                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
+                    dx = enemy.body.center[0] - tower.body.center[0]
+                    dy = enemy.body.center[1] - tower.body.center[1]
+                    quad = quadrant(tower.body, enemy.body)
 
+                    # Vertical Case
+                    if enemy.speed[0] == 0:
+                        # Quadratic formula to calculate impact time
+                        time = quadratic_formula((enemy.speed[1]**2 - tower.shellSpeed**2), 2.0*enemy.speed[1]*dy, dx**2 + dy**2)[1]
+                        beta = math.acos(abs(dx / (tower.shellSpeed * time)))
+                    # Horizontal Case
+                    else:
+                        time = quadratic_formula((enemy.speed[0]**2 - tower.shellSpeed**2), 2.0*enemy.speed[0]*dx, dx**2 + dy**2)[1]
+                        beta = math.asin(abs(dy / (tower.shellSpeed * time)))
+
+                    # CAST rule accomodations
+                    if quad == 1:
+                        angle = beta
+                    elif quad == 2:
+                        angle = math.pi - beta
+                    elif quad == 3:
+                        angle = math.pi + beta 
+                    else:
+                        angle = 2.0 * math.pi - beta
+
+                    # If you want some inaccuracy to some towers (eg. machine guns, uncomment the next two lines)
+                    # dispersion = random.randint(-10, 10) / 100.0
+                    # angle += dispersion
+
+
+
+
+                    tower_bullets.append(
+                        Bullet((tower.shellSpeed * math.cos(angle), tower.shellSpeed * math.sin(angle)),
+                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
+                             
                 # now based on the tower damage specified in the properties file 
-                enemy.hp = enemy.hp - tower.damage
+                #enemy.hp = enemy.hp - tower.damage
                 break
         tower.time += 1
+
+    for bullet in tower_bullets:
+        if bullet.check_destroy():
+            tower_bullets.remove(bullet)
 
     for bullet in tower_bullets:
         pygame.draw.rect(screen, bullet.colour, bullet.body)
@@ -269,10 +304,16 @@ while True:
             if bullet.body.colliderect(enemy.body):
                 enemy.hp = enemy.hp - SHOT_DMG
                 bullet_list.remove(bullet)
+        for bullet in tower_bullets:
+            if bullet.body.colliderect(enemy.body):
+                enemy.hp = enemy.hp - tower.damage
+                tower_bullets.remove(bullet)
 
         if enemy.check_destroy():
             enemy_list.remove(enemy)
 
+
+    # Draw enemy if still alive at the end of the frame
     for enemy in enemy_list:
         pygame.draw.rect(screen, enemy.colour, enemy.body)
 

@@ -59,7 +59,7 @@ class Enemy(object):
         def __init__(self, body, colour, speed, screen_width, screen_height, hp, max_hp = 100):
 
             self.body = body 
-            self.speed = speed 
+            self.speed = speed # Tuple (v_x, v_y)
             self.colour = colour 
             self.screen_width = screen_width
             self.screen_height = screen_height
@@ -99,8 +99,10 @@ class Bullet(object):
 
 class Tower(object):
 
-    def __init__(self, pos, shellSpeed = 120, reload = 15):
+
+    def __init__(self, pos, shellSpeed = 20, reload = 30):
         # moved space_between to properties
+        # shellSpeed should be >= 10, anything smaller will create rounding inaccuracies
         self.pos = pos 
         self.level = 0
         self.type =  upgrade_list[self.level] # Each tower type will have a different colour  

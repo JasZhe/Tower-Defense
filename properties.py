@@ -13,7 +13,7 @@ DARK_BLUE = (0, 30, 205)
 CYAN = (0, 255, 255)
 
 # Timing constants 
-FRAME_RATE = 30 
+FRAME_RATE = 30
 TICK_SPEED = 300 
 
 # Window size properties
@@ -29,7 +29,7 @@ SHOT_WIDTH = 5
 SHOT_HEIGHT = 20
 
 # Direction constants
-RATE = 3 
+RATE = 3
 RIGHT = (RATE, 0)
 LEFT = (-RATE, 0)
 UP = (0, -RATE)
@@ -43,8 +43,8 @@ UPGRADE_DELAY = 300
 INITIAL_SIZE = (20, 20)
 upgrade_list = [GREEN, CYAN, BLUE, DARK_BLUE, YELLOW, ORANGE, MAGENTA, WHITE]
 
-tower_damage = {GREEN : 0.5, CYAN : 0.75, BLUE : 1, DARK_BLUE : 1.25, YELLOW : 1.5, ORANGE : 1.75,
-				MAGENTA : 2, WHITE : 2.25}
+tower_damage = {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
+				MAGENTA : 55, WHITE : 60}
 
 tower_cost = {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORANGE : 40,
 				MAGENTA : 60, WHITE : 80}
@@ -57,7 +57,7 @@ tower_range = {GREEN : 160, CYAN : 170, BLUE : 180, DARK_BLUE : 185, YELLOW : 19
 
 # enemy stuff 
 counter = 0
-spawn_rate = 50
+spawn_time = 50
 enemy_size = (30, 30)
 enemy_start = (10, HEIGHT / 2)
 enemy_speed = RIGHT
