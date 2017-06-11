@@ -99,8 +99,10 @@ class Bullet(object):
 
 class Tower(object):
 
-    def __init__(self, pos, shellSpeed = 8, reload = 8):
+
+    def __init__(self, pos, shellSpeed = 20, reload = 30):
         # moved space_between to properties
+        # shellSpeed should be >= 10, anything smaller will create rounding inaccuracies
         self.pos = pos 
         self.level = 0
         self.type =  upgrade_list[self.level] # Each tower type will have a different colour  

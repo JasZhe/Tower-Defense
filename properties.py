@@ -29,7 +29,7 @@ SHOT_WIDTH = 5
 SHOT_HEIGHT = 20
 
 # Direction constants
-RATE = 2
+RATE = 3
 RIGHT = (RATE, 0)
 LEFT = (-RATE, 0)
 UP = (0, -RATE)
@@ -43,8 +43,8 @@ UPGRADE_DELAY = 300
 INITIAL_SIZE = (20, 20)
 upgrade_list = [GREEN, CYAN, BLUE, DARK_BLUE, YELLOW, ORANGE, MAGENTA, WHITE]
 
-tower_damage = {GREEN : 5, CYAN : 0.75, BLUE : 1, DARK_BLUE : 1.25, YELLOW : 1.5, ORANGE : 1.75,
-				MAGENTA : 2, WHITE : 2.25}
+tower_damage = {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
+				MAGENTA : 55, WHITE : 60}
 
 tower_cost = {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORANGE : 40,
 				MAGENTA : 60, WHITE : 80}
@@ -52,7 +52,7 @@ tower_cost = {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORAN
 tower_inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
 			  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
 
-tower_range = {GREEN : 360, CYAN : 170, BLUE : 180, DARK_BLUE : 185, YELLOW : 190, ORANGE : 195,
+tower_range = {GREEN : 160, CYAN : 170, BLUE : 180, DARK_BLUE : 185, YELLOW : 190, ORANGE : 195,
 				MAGENTA : 200, WHITE : 210}
 
 # enemy stuff 

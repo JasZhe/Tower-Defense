@@ -236,22 +236,41 @@ while True:
                 pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
 
                 if tower.canShoot():
-                    #if enemy.body.x - tower.body.x == 0:
-                    c = (enemy.body.center[1] - tower.body.center[1]) * 1.0 / (enemy.body.center[0] - tower.body.center[0])
-                    if enemy.speed[0] == 0: 
-                        angle = math.acos(-enemy.speed[1] * 1.0 / (tower.shellSpeed * math.sqrt(1.0 + c * c))) - math.atan(1/c)
+                    dx = enemy.body.center[0] - tower.body.center[0]
+                    dy = enemy.body.center[1] - tower.body.center[1]
+                    quad = quadrant(tower.body, enemy.body)
 
-                        
-                        # CAST rule accomodation
-                        if (c > 0 and enemy.body.center[1] - tower.body.center[1] <= 0) or \
-                            (c < 0 and enemy.body.center[1] - tower.body.center[1] <= 0):
+                    # Vertical Case
+                    if enemy.speed[0] == 0:
+                        # Quadratic formula to calculate impact time
+                        time = quadratic_formula((enemy.speed[1]**2 - tower.shellSpeed**2), 2.0*enemy.speed[1]*dy, dx**2 + dy**2)[1]
+                        beta = math.acos(abs(dx / (tower.shellSpeed * time)))
+                    # Horizontal Case
+                    else:
+                        time = quadratic_formula((enemy.speed[0]**2 - tower.shellSpeed**2), 2.0*enemy.speed[0]*dx, dx**2 + dy**2)[1]
+                        beta = math.asin(abs(dy / (tower.shellSpeed * time)))
+
+                    # CAST rule accomodations
+                    if quad == 1:
+                        angle = beta
+                    elif quad == 2:
+                        angle = math.pi - beta
+                    elif quad == 3:
+                        angle = math.pi + beta 
+                    else:
+                        angle = 2.0 * math.pi - beta
+
+                    # If you want some inaccuracy to some towers (eg. machine guns, uncomment the next two lines)
+                    # dispersion = random.randint(-10, 10) / 100.0
+                    # angle += dispersion
 
 
-                            angle += math.pi
-                        tower_bullets.append(
-                            Bullet((tower.shellSpeed*math.cos(angle), tower.shellSpeed*math.sin(angle)),
-                             tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
 
+
+                    tower_bullets.append(
+                        Bullet((tower.shellSpeed * math.cos(angle), tower.shellSpeed * math.sin(angle)),
+                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5))
+                             
                 # now based on the tower damage specified in the properties file 
                 #enemy.hp = enemy.hp - tower.damage
                 break
