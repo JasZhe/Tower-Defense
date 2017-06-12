@@ -105,11 +105,15 @@ rifle_gun = pygame.mixer.Sound(file="sounds/rifle_gun.wav")
 sniper_gun = pygame.mixer.Sound(file="sounds/sniper_gun.wav")
 machine_gun = pygame.mixer.Sound(file="sounds/machine_gun.wav")
 player_gun = pygame.mixer.Sound(file="sounds/player_gun.wav")
+heavy_gun = pygame.mixer.Sound(file="sounds/heavy_gun.wav")
+
+explode_sound = pygame.mixer.Sound(file="sounds/explode_sound.wav")
 
 tower_sounds = {
     "rifle" : rifle_gun,
     "sniper" : sniper_gun,
-    "machine_gun" : machine_gun
+    "machine_gun" : machine_gun,
+    "heavy" : heavy_gun
 }
 
 # Main Gameloop
@@ -166,13 +170,15 @@ while True:
            # print(bullet_speed)
 
     if pressed[pygame.K_t]:
-        rand = random.randint(0,2)
+        rand = random.randint(0,3)
         if rand == 0:
             tower_class = "rifle"
         elif rand == 1:
             tower_class = "sniper"
         elif rand == 2:
             tower_class = "machine_gun"
+        elif rand == 3:
+            tower_class = "heavy"
 
         temp = Tower((player.body.x, player.body.y),tower_class)
         placeable = 1 
@@ -259,7 +265,7 @@ while True:
         for enemy in enemy_list:
             if distance(tower.body.center, enemy.body.center) <= tower.max_range:
                 # draws line to indicate hit for now
-                pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
+                #pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
 
                 if tower.canShoot():
                     pygame.mixer.Sound.play(tower_sounds[tower.tower_class])
@@ -288,15 +294,20 @@ while True:
                         angle = 2.0 * math.pi - beta
 
                     if tower.tower_class == "machine_gun":
-                        dispersion = random.randint(-12, 12) / 100.0
+                        dispersion = random.randint(-15, 15) / 100.0
                         angle += dispersion
 
-
+                    if tower.tower_class == "heavy":
+                        w = 15
+                        h = 15
+                    else:
+                        w = 5
+                        h = 5
 
 
                     tower_bullets.append(
                         Bullet((tower.shell_speed * math.cos(angle), tower.shell_speed * math.sin(angle)),
-                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5, damage = tower.damage))
+                         tower.body.center, YELLOW, HEIGHT, w, h, damage = tower.damage))
                              
                 # now based on the tower damage specified in the properties file 
                 #enemy.hp = enemy.hp - tower.damage
@@ -336,6 +347,14 @@ while True:
                 enemy.hp = enemy.hp - bullet.damage
                 tower_bullets.remove(bullet)
 
+                # AOE weapon
+                if bullet.body.width == 15:
+                    pygame.mixer.Sound.play(explode_sound)
+                    for enemy in enemy_list:
+                        if distance(bullet.body.center, enemy.body.center) <= 100:
+                            enemy.hp = enemy.hp - bullet.damage * \
+                            1 / (1 + math.sqrt(distance(bullet.body.center, enemy.body.center))/30)
+
         if enemy.check_destroy():
             enemy_list.remove(enemy)
 
@@ -350,7 +369,6 @@ while True:
 
         # HP Bar
         pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
-        #pygame.Rect((10, height / 2), (30, 30))
 
         color = BLACK
         if enemy.hp > 0:
@@ -360,7 +378,7 @@ while True:
                 colour = ORANGE
             else:
                 colour = RED
-       # pygame.draw.rect(gameDisplay, colour, [ship_X, ship_Y + shipSize - 5, shipSize * hp / 100, 8])
+      
         pygame.draw.rect(screen, colour, 
             [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
         enemy.update()

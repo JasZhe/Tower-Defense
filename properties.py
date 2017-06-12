@@ -84,8 +84,8 @@ sniper_stats = {
 }
 
 machine_gun_stats = {
-	"damage" : {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 25, ORANGE : 30,
-					MAGENTA : 35, WHITE : 40},
+	"damage" : {GREEN : 5, CYAN : 6, BLUE : 7, DARK_BLUE : 8, YELLOW : 9, ORANGE : 10,
+					MAGENTA : 12, WHITE : 14},
 
 	"cost" : {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
 					MAGENTA : 600, WHITE : 800},
@@ -93,8 +93,8 @@ machine_gun_stats = {
 	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
 				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
 
-	"range" : {GREEN : 160, CYAN : 170, BLUE : 180, DARK_BLUE : 190, YELLOW : 200, ORANGE : 210,
-					MAGENTA : 220, WHITE : 230},
+	"range" : {GREEN : 170, CYAN : 180, BLUE : 190, DARK_BLUE : 200, YELLOW : 210, ORANGE : 220,
+					MAGENTA : 230, WHITE : 240},
 
 	"reload": 4,
 	
@@ -103,20 +103,39 @@ machine_gun_stats = {
 
 }
 
+heavy_gun_stats = {
+	"damage" : {GREEN : 60, CYAN : 70, BLUE : 80, DARK_BLUE : 90, YELLOW : 100, ORANGE : 120,
+					MAGENTA : 140, WHITE : 160},
 
-tower_classes = {"rifle": rifle_stats, "sniper": sniper_stats, "machine_gun": machine_gun_stats, "heavy": 4}
+	"cost" : {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
+					MAGENTA : 600, WHITE : 800},
 
-tower_damage = {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
-				MAGENTA : 55, WHITE : 60}
+	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
+				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
 
-tower_cost = {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORANGE : 40,
-				MAGENTA : 60, WHITE : 80}
+	"range" : {GREEN : 250, CYAN : 260, BLUE : 270, DARK_BLUE : 280, YELLOW : 300, ORANGE : 320,
+					MAGENTA : 340, WHITE : 360},
 
-tower_inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
-			  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
+	"reload": 120,
+	
 
-tower_range = {GREEN : 180, CYAN : 190, BLUE : 200, DARK_BLUE : 210, YELLOW : 220, ORANGE : 230,
-				MAGENTA : 240, WHITE : 250}
+	"shell_speed": 10
+
+}
+
+tower_classes = {"rifle": rifle_stats, "sniper": sniper_stats, "machine_gun": machine_gun_stats, "heavy": heavy_gun_stats}
+
+# tower_damage = {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
+# 				MAGENTA : 55, WHITE : 60}
+
+# tower_cost = {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORANGE : 40,
+# 				MAGENTA : 60, WHITE : 80}
+
+# tower_inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
+# 			  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
+
+# tower_range = {GREEN : 180, CYAN : 190, BLUE : 200, DARK_BLUE : 210, YELLOW : 220, ORANGE : 230,
+# 				MAGENTA : 240, WHITE : 250}
 
 # enemy stuff 
 counter = 0
