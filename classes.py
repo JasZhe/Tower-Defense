@@ -3,8 +3,8 @@ from functions import *
 from properties import * 
 
 # A module of all classes in the game
-class Player(object): 
 
+class Player(object): 
     def __init__(self, body, colour, screen_width, screen_height, x, y, direction = "U", gun_size = 5, gun_colour = (255,255,0)): 
         self.body = body
         self.colour = colour
@@ -54,7 +54,6 @@ class Player(object):
 
 
 class Enemy(object):
-
         # Add health 
         def __init__(self, body, colour, speed, screen_width, screen_height, hp, max_hp = 100):
 
@@ -79,7 +78,6 @@ class Enemy(object):
 
 
 class Bullet(object):
-
     def __init__(self, speed, pos, colour, screen_height, width = 5, height = 20, damage = 10):
         self.speed = speed
         # Inital position of the bullet ie. where the player made the shot 
@@ -99,8 +97,6 @@ class Bullet(object):
             return False
 
 class Tower(object):
-
-
     def __init__(self, pos, tower_class = "rifle"):
         # moved space_between to properties
         # shellSpeed should be >= 10, anything smaller will create rounding inaccuracies
@@ -134,8 +130,61 @@ class Tower(object):
             return False
 
     # Calculates damage rate (Damage Per Frame)
-    def dpm (self):
+    def dpm(self):
         return self.damage / self.reload
 
+# Class for the game map
+# Constructor: listOf(listOf(Int))
+# Requires: Each list must be the same length
+class Map:
+    def __init__(self, map_array):
+        valid = True
+        if len(map_array) > 0 and len(map_array[0]) > 0:
+            row_length = len(map_array[0])
+            for row in map_array:
+                if len(row) != row_length:
+                    self.grid = 'Inconsistent row lengths.'
+                    valid = False
+                    break
+            if valid:
+                self.grid = map_array
+        else:
+            self.grid = 'Invalid Map'
 
+    # Finds the length of the map
+    def row_length(self):
+        return len(self.grid)
 
+    # Find the height of the map
+    def col_length(self):
+        return len(self.grid[0])
+
+    # Checks if a set of index is valid in the map
+    def check_valid(self, row, col):
+        if row >= self.row_length() or col >= self.col_length():
+            print("Invalid parameters!")
+            return -1
+        return True
+
+    # returns the block type at a certain location
+    def get_block(self, row, col):
+        self.check_valid(row, col)
+        return self.grid[row][col]
+
+    # checks if a location in a path block
+    def is_path(self, row, col):
+        self.check_valid(row, col)
+        return self.get_block(row, col) == 1
+
+    # checks if a rectangle object is on the path
+    def on_path(self, rect):
+        return False
+
+    # Draws Map
+    def draw (self, display, path_colour = WHITE, grid_size = 30):
+        h = self.row_length()
+        w = self.col_length()
+        for row in range(0, h):
+            for col in range(0, w):
+                if PATH[row][col]:
+                    pygame.draw.rect(display, path_colour, [col * grid_size, row * grid_size, grid_size, grid_size])

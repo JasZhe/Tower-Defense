@@ -65,6 +65,10 @@ pygame.mixer.init()
 screen = pygame.display.set_mode(SIZE) 
 clock = pygame.time.Clock()
 
+# Map settings
+game_map = Map(PATH)
+
+# Player info
 player = Player(pygame.Rect((10, 10), (30, 30)), BLUE, WIDTH, HEIGHT, 
     TICK_SPEED / FRAME_RATE, TICK_SPEED / FRAME_RATE, gun_colour = YELLOW)
 
@@ -87,7 +91,6 @@ bullet_speed_y = 20
 bullet_speed = (bullet_speed_x, bullet_speed_y)
 
 # Tower stuff 
-# moved the tower stuff to properties 
 tower_list = [] 
 last_upgrade = 0 
 
@@ -251,10 +254,7 @@ while True:
     
 
     # Draws path
-    for row in range(0, GRID_HEIGHT):
-        for col in range(0, GRID_WIDTH):
-            if PATH[row][col]:
-                pygame.draw.rect(screen, WHITE, [col * GRID_SIZE, row * GRID_SIZE, GRID_SIZE, GRID_SIZE])
+    game_map.draw(screen, YELLOW)
 
     
     # This loop is just used to draw the blocks used to signal turns for the enemies
