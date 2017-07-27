@@ -182,7 +182,7 @@ class Map:
     # checks if a location in a path block
     def is_path(self, row, col):
         self.check_valid(row, col)
-        return self.get_block_type(row, col) == 1
+        return self.get_block_type(row, col) == 'P'
 
     # checks if a rectangle object is on the path
     def on_path(self, rect, grid_size = 30):
@@ -200,5 +200,5 @@ class Map:
         col_count = self.row_length()
         for row in range(0, row_count):
             for col in range(0, col_count):
-                if PATH[row][col]:
+                if self.is_path(row, col):
                     pygame.draw.rect(display, path_colour, [col * grid_size, row * grid_size, grid_size, grid_size])
