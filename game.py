@@ -249,6 +249,14 @@ while True:
     screen.fill(BLACK) 
     screen.blit(label, (10, 10))
     
+
+    # Draws path
+    for row in range(0, GRID_HEIGHT):
+        for col in range(0, GRID_WIDTH):
+            if PATH[row][col]:
+                pygame.draw.rect(screen, WHITE, [col * GRID_SIZE, row * GRID_SIZE, GRID_SIZE, GRID_SIZE])
+
+    
     # This loop is just used to draw the blocks used to signal turns for the enemies
     # comment out this loop when it's not needed anymore 
     for turn in enemy_turn_list:
@@ -340,11 +348,11 @@ while True:
     for enemy in enemy_list:
         for bullet in bullet_list:
             if bullet.body.colliderect(enemy.body):
-                enemy.hp = enemy.hp - SHOT_DMG
+                enemy.hp = max(enemy.hp - SHOT_DMG, 0)
                 bullet_list.remove(bullet)
         for bullet in tower_bullets:
             if bullet.body.colliderect(enemy.body):
-                enemy.hp = enemy.hp - bullet.damage
+                enemy.hp = max(enemy.hp - bullet.damage, 0)
                 tower_bullets.remove(bullet)
 
                 # AOE weapon
@@ -352,8 +360,8 @@ while True:
                     pygame.mixer.Sound.play(explode_sound)
                     for enemy in enemy_list:
                         if distance(bullet.body.center, enemy.body.center) <= 100:
-                            enemy.hp = enemy.hp - bullet.damage * \
-                            1 / (1 + math.sqrt(distance(bullet.body.center, enemy.body.center))/30)
+                            enemy.hp = max(enemy.hp - bullet.damage * \
+                            1 / (1 + math.sqrt(distance(bullet.body.center, enemy.body.center))/30),0)
 
         if enemy.check_destroy():
             enemy_list.remove(enemy)
@@ -383,6 +391,7 @@ while True:
             [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
         enemy.update()
 
+    pygame.draw.rect(screen, YELLOW, [0, 0, GRID_SIZE, GRID_SIZE])
     pygame.display.update()
     clock.tick(FRAME_RATE)
     counter = counter + 1 
