@@ -153,38 +153,52 @@ class Map:
 
     # Finds the length of the map
     def row_length(self):
-        return len(self.grid)
+        return len(self.grid[0])
 
     # Find the height of the map
     def col_length(self):
-        return len(self.grid[0])
+        return len(self.grid)
 
     # Checks if a set of index is valid in the map
-    def check_valid(self, row, col):
-        if row >= self.row_length() or col >= self.col_length():
+    def check_valid(self, row = False, col = False):
+        if row == False and col == False:
+            row_length = self.row_length()
+            for row in self.grid:
+                if len(row) != row_length:
+                    return False
+            return True
+
+        elif row >= self.col_length() or col >= self.row_length():
             print("Invalid parameters!")
-            return -1
-        return True
+            return False
+        else:
+            return True
 
     # returns the block type at a certain location
-    def get_block(self, row, col):
+    def get_block_type(self, row, col):
         self.check_valid(row, col)
         return self.grid[row][col]
 
     # checks if a location in a path block
     def is_path(self, row, col):
         self.check_valid(row, col)
-        return self.get_block(row, col) == 1
+        return self.get_block_type(row, col) == 1
 
     # checks if a rectangle object is on the path
-    def on_path(self, rect):
+    def on_path(self, rect, grid_size = 30):
+        row_count = self.col_length()
+        col_count = self.row_length()
+        for row in range(0, row_count):
+            for col in range(0, col_count):
+                if self.is_path(row, col) and collide(col * grid_size, row * grid_size, grid_size, grid_size, rect.x, rect.y, rect.width, rect.height):
+                    return True
         return False
 
     # Draws Map
     def draw (self, display, path_colour = WHITE, grid_size = 30):
-        h = self.row_length()
-        w = self.col_length()
-        for row in range(0, h):
-            for col in range(0, w):
+        row_count = self.col_length()
+        col_count = self.row_length()
+        for row in range(0, row_count):
+            for col in range(0, col_count):
                 if PATH[row][col]:
                     pygame.draw.rect(display, path_colour, [col * grid_size, row * grid_size, grid_size, grid_size])

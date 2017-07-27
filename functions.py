@@ -44,3 +44,11 @@ def quadratic_formula (a, b, c):
 			x2 = (-b - math.sqrt(dis)) / (2.0 * a)
 			return (x1, x2)
 
+# Rectangle collision detector
+def collide (x1, y1, l1, w1, x2, y2, l2, w2):
+    if x1 < x2 + l2 and x1 + l1 > x2 and \
+       y1 < y2 + w2 and y1 + w1 > y2:
+        return True
+
+    else:
+        return False

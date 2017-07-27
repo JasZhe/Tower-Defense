@@ -184,10 +184,12 @@ while True:
             tower_class = "heavy"
 
         temp = Tower((player.body.x, player.body.y),tower_class)
-        placeable = 1 
+        placeable = True
+        if game_map.on_path(player.body):
+            placeable = False
         for tower in tower_list:
             if distance(temp.body.center, tower.body.center) <= space_between: 
-                placeable = 0
+                placeable = False
                 break
         if placeable:
             tower_list.append(temp)
