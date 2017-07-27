@@ -74,6 +74,7 @@ player = Player(pygame.Rect((10, 10), (30, 30)), BLUE, WIDTH, HEIGHT,
 
 # enemy stuff
 enemy_list = [] 
+enemy_start = game_map.starting_point()
 
 # Enemy pathing
 turn_size = (45, 45)
@@ -132,11 +133,6 @@ while True:
         enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED,
                                 enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp))
 
-    for enemy in enemy_list:
-        for turn in enemy_turn_list:
-            if enemy.body.colliderect(turn[0]):
-                enemy.speed = turn[1]
-
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_UP]:
         player.update(y = -player.vertical_speed)
@@ -154,6 +150,19 @@ while True:
         player.update(x = player.horizontal_speed)
         player.direction = "R"
         bullet_speed = (bullet_speed_y, bullet_speed_x)
+
+    if pressed[pygame.K_w]:
+        for enemy in enemy_list:
+            enemy.turn('U')
+    if pressed[pygame.K_s]:
+        for enemy in enemy_list:
+            enemy.turn('D')
+    if pressed[pygame.K_a]:
+        for enemy in enemy_list:
+            enemy.turn('L')
+    if pressed[pygame.K_d]:
+        for enemy in enemy_list:
+            enemy.turn('R')
 
     if pressed[pygame.K_SPACE]:
         now = pygame.time.get_ticks()
@@ -256,19 +265,19 @@ while True:
     
 
     # Draws path
-    game_map.draw(screen, YELLOW)
+    game_map.draw(screen, GRAY)
 
     
     # This loop is just used to draw the blocks used to signal turns for the enemies
     # comment out this loop when it's not needed anymore 
-    for turn in enemy_turn_list:
-        pygame.draw.rect(screen, ORANGE, turn[0])
+    #for turn in enemy_turn_list:
+    #    pygame.draw.rect(screen, ORANGE, turn[0])
 
     for tower in tower_list:
         pygame.draw.rect(screen, tower.type, tower.body)
         
         # view range only when player is in range
-        if distance(tower.body.center, player.body.center) <= tower.max_range:
+        if distance(tower.body.center, player.body.center) <= 40:
             pygame.draw.circle(screen, GREEN, tower.body.center, tower.max_range, 1)
 
         # Tower range
@@ -284,13 +293,13 @@ while True:
                     quad = quadrant(tower.body, enemy.body)
 
                     # Vertical Case
-                    if enemy.speed[0] == 0:
+                    if enemy.velocity[0] == 0:
                         # Quadratic formula to calculate impact time
-                        time = quadratic_formula((enemy.speed[1]**2 - tower.shell_speed**2), 2.0*enemy.speed[1]*dy, dx**2 + dy**2)[1]
+                        time = quadratic_formula((enemy.velocity[1]**2 - tower.shell_speed**2), 2.0*enemy.velocity[1]*dy, dx**2 + dy**2)[1]
                         beta = math.acos(abs(dx / (tower.shell_speed * time)))
                     # Horizontal Case
                     else:
-                        time = quadratic_formula((enemy.speed[0]**2 - tower.shell_speed**2), 2.0*enemy.speed[0]*dx, dx**2 + dy**2)[1]
+                        time = quadratic_formula((enemy.velocity[0]**2 - tower.shell_speed**2), 2.0*enemy.velocity[0]*dx, dx**2 + dy**2)[1]
                         beta = math.asin(abs(dy / (tower.shell_speed * time)))
 
                     # CAST rule accomodations
@@ -393,7 +402,6 @@ while True:
             [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
         enemy.update()
 
-    pygame.draw.rect(screen, YELLOW, [0, 0, GRID_SIZE, GRID_SIZE])
     pygame.display.update()
     clock.tick(FRAME_RATE)
     counter = counter + 1 

@@ -11,6 +11,7 @@ WHITE = (255, 255, 255)
 MAGENTA = (255, 0, 255)
 DARK_BLUE = (0, 30, 205)
 CYAN = (0, 255, 255)
+GRAY = (100, 100, 100)
 
 # Timing constants 
 FRAME_RATE = 30
@@ -172,7 +173,6 @@ tower_classes = {
 counter = 0
 spawn_time = 50
 enemy_size = (30, 30)
-enemy_start = (10, HEIGHT / 2)
 enemy_speed = RIGHT
 enemy_initial_hp = 100 
 enemy_max_hp = 100

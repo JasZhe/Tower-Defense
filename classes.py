@@ -55,10 +55,10 @@ class Player(object):
 
 class Enemy(object):
         # Add health 
-        def __init__(self, body, colour, speed, screen_width, screen_height, hp, max_hp = 100):
+        def __init__(self, body, colour, velocity, screen_width, screen_height, hp, max_hp = 100):
 
             self.body = body 
-            self.speed = speed # Tuple (v_x, v_y)
+            self.velocity = velocity # Tuple (v_x, v_y)
             self.colour = colour 
             self.screen_width = screen_width
             self.screen_height = screen_height
@@ -67,7 +67,7 @@ class Enemy(object):
 
 
         def update(self):
-            self.body.move_ip(self.speed)
+            self.body.move_ip(self.velocity)
 
         # Return true if the enemy has left the screen or destroyed
         def check_destroy(self):
@@ -75,6 +75,33 @@ class Enemy(object):
                 return True
             else:
                 return False
+
+        # get_direction()
+        # returns the direction that the enemy is going
+        # Void -> One of ['U', 'D', 'L', 'R']
+        def get_direction(self):
+            if self.velocity[0] == 0:
+                if self.velocity[1] > 0:
+                    return 'D'
+                else:
+                    return 'U'
+            elif self.velocity[0] > 0:
+                return 'R'
+            else:
+                return 'L'
+        # turn
+        # Changes the direction that the enemy is going
+        # One of ['U', 'D', 'L', 'R'] -> Void
+        def turn(self, direction):
+            speed = max(abs(self.velocity[0]), abs(self.velocity[1]))
+            if direction == 'U':
+                self.velocity = (0, -speed)
+            elif direction == 'D':
+                self.velocity = (0, speed)
+            elif direction == 'L':
+                self.velocity = (-speed, 0)
+            elif direction == 'R':
+                self.velocity = (speed, 0)
 
 
 class Bullet(object):
@@ -193,6 +220,20 @@ class Map:
                 if self.is_path(row, col) and collide(col * grid_size, row * grid_size, grid_size, grid_size, rect.x, rect.y, rect.width, rect.height):
                     return True
         return False
+
+    # starting_point
+    # Find the starting pointing of the path if it exists, must start from left side of screen (for now)
+    # Void -> (Int, Int)
+    def starting_point(self, grid_size = 30):
+        for index, row in enumerate(self.grid):
+            if row[0] == 'P':
+                if grid_size:
+                    return (0, index * grid_size)
+                else:
+                    return (index, 0)
+        print("No starting point found.")
+        return False
+
 
     # Draws Map
     def draw (self, display, path_colour = WHITE, grid_size = 30):
