@@ -164,20 +164,65 @@ class Tower(object):
 # Constructor: listOf(listOf(Int))
 # Requires: Each list must be the same length
 class Map:
-    def __init__(self, map_array):
-        valid = True
-        if len(map_array) > 0 and len(map_array[0]) > 0:
-            row_length = len(map_array[0])
-            for row in map_array:
-                if len(row) != row_length:
-                    self.grid = 'Inconsistent row lengths.'
-                    valid = False
-                    break
-            if valid:
-                self.grid = map_array
-        else:
-            self.grid = 'Invalid Map'
+    # Generates game map based off of the map file
+    def __init__(self, map_file):
+        previous_corner = None
+        line_number = 1
+        self.corners = []
+        with open('map.txt', 'r') as file:
+            for line in file:
+                if line_number == 1:
+                    self.rows = int(line.split(':')[1])
+                elif line_number == 2:
+                    self.cols = int(line.split(':')[1])
+                    grid = [' '] * self.rows
+                    for i in range(0, self.rows):
+                        grid[i] = [' '] * self.cols
+                        self.grid = grid
+                elif line_number == 3:
+                    self.grid_size = int(line.split(':')[1])
+                else:
+                    coords = line.strip().split(',')
+                    self.corners.append((int(coords[0]), int(coords[1])))
+                    self.grid[int(coords[0])][int(coords[1])] = 'P'
+                line_number = line_number + 1
+            file.close()
 
+        print(self.corners)
+        corner_len = len(self.corners)
+        for i in range(0, corner_len):
+            if i + 1 < corner_len:
+                if self.corners[i][0] == self.corners[i + 1][0]:
+                    lower = min(self.corners[i][1], self.corners[i + 1][1])
+                    higher = max(self.corners[i][1], self.corners[i + 1][1])
+                    for k in range (lower, higher):
+                        self.grid[self.corners[i][0]][k] = 'P'
+
+                elif self.corners[i][1] == self.corners[i + 1][1]:
+                    lower = min(self.corners[i][0], self.corners[i + 1][0])
+                    higher = max(self.corners[i][0], self.corners[i + 1][0])
+                    for k in range (lower, higher):
+                        self.grid[k][self.corners[i][1]] = 'P'
+        self.save_map()
+
+        # valid = True
+        # if len(map_file) > 0 and len(map_file[0]) > 0:
+        #     row_length = len(map_file[0])
+        #     for row in map_file:
+        #         if len(row) != row_length:
+        #             self.grid = 'Inconsistent row lengths.'
+        #             valid = False
+        #             break
+        #     if valid:
+        #         self.grid = map_file
+        # else:
+        #     self.grid = 'Invalid Map'
+
+    def save_map(self, file_name = 'map_view.txt'):
+        with open(file_name, 'w') as file:
+            for row in self.grid:
+                file.write(str(row) + '\n')
+            file.close()
     # Finds the length of the map
     def row_length(self):
         return len(self.grid[0])
