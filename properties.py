@@ -136,11 +136,3 @@ tower_classes = {
 
 # tower_range = {GREEN : 180, CYAN : 190, BLUE : 200, DARK_BLUE : 210, YELLOW : 220, ORANGE : 230,
 # 				MAGENTA : 240, WHITE : 250}
-
-# enemy stuff 
-counter = 0
-spawn_time = 50
-enemy_size = (30, 30)
-enemy_speed = RIGHT
-enemy_initial_hp = 100 
-enemy_max_hp = 100

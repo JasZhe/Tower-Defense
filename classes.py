@@ -169,7 +169,7 @@ class Map:
         previous_corner = None
         line_number = 1
         self.corners = []
-        with open('map.txt', 'r') as file:
+        with open(map_file, 'r') as file:
             for line in file:
                 if line_number == 1:
                     self.rows = int(line.split(':')[1])
@@ -188,7 +188,6 @@ class Map:
                 line_number = line_number + 1
             file.close()
 
-        print(self.corners)
         corner_len = len(self.corners)
         for i in range(0, corner_len):
             if i + 1 < corner_len:
@@ -256,24 +255,46 @@ class Map:
         self.check_valid(row, col)
         return self.get_block_type(row, col) == 'P'
 
+    def is_corner(self, corner):
+        return corner in self.corners and \
+        self.corners.index(corner) != len(self.corners) - 1
+
+    def turn_direction (self, corner):
+        if self.is_corner(corner):
+            index = self.corners.index(corner)
+            if corner[0] == self.corners[index + 1][0]:
+                if self.corners[index + 1][1] > corner[1]:
+                    return 'R'
+                else:
+                    return 'L'
+            elif corner[1] == self.corners[index + 1][1]:
+                if self.corners[index + 1][0] > corner[0]:
+                    return 'D'
+                else:
+                    return 'U'
+            else:
+                print("Unexpected error")  
+        else:
+            print("Not a corner")
+
     # checks if a rectangle object is on the path
-    def on_path(self, rect, grid_size = 30):
+    def on_path(self, rect):
         row_count = self.col_length()
         col_count = self.row_length()
         for row in range(0, row_count):
             for col in range(0, col_count):
-                if self.is_path(row, col) and collide(col * grid_size, row * grid_size, grid_size, grid_size, rect.x, rect.y, rect.width, rect.height):
+                if self.is_path(row, col) and collide(col * self.grid_size, row * self.grid_size, self.grid_size, self.grid_size, rect.x, rect.y, rect.width, rect.height):
                     return True
         return False
 
     # starting_point
     # Find the starting pointing of the path if it exists, must start from left side of screen (for now)
     # Void -> (Int, Int)
-    def starting_point(self, grid_size = 30):
+    def starting_point(self):
         for index, row in enumerate(self.grid):
             if row[0] == 'P':
-                if grid_size:
-                    return (0, index * grid_size)
+                if self.grid_size:
+                    return (0, index * self.grid_size)
                 else:
                     return (index, 0)
         print("No starting point found.")
@@ -281,10 +302,10 @@ class Map:
 
 
     # Draws Map
-    def draw (self, display, path_colour = WHITE, grid_size = 30):
+    def draw (self, display, path_colour = WHITE):
         row_count = self.col_length()
         col_count = self.row_length()
         for row in range(0, row_count):
             for col in range(0, col_count):
                 if self.is_path(row, col):
-                    pygame.draw.rect(display, path_colour, [col * grid_size, row * grid_size, grid_size, grid_size])
+                    pygame.draw.rect(display, path_colour, [col * self.grid_size, row * self.grid_size, self.grid_size, self.grid_size])
