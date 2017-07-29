@@ -51,8 +51,6 @@ class Player(object):
             pygame.Rect(coord_add(self.body.topright, (0,  (self.body.height - self.gun_size)/2)), 
                 (self.gun_size, self.gun_size)))
 
-
-
 class Enemy(object):
         # Add health 
         def __init__(self, body, colour, velocity, screen_width, screen_height, hp, max_hp = 100):
@@ -245,6 +243,10 @@ class Map:
         else:
             return True
 
+    # Converts a coord in the grid to the screen pixels
+    def to_pixel (self, coord):
+        return (coord[1] * self.grid_size, coord[0] * self.grid_size)
+
     # returns the block type at a certain location
     def get_block_type(self, row, col):
         self.check_valid(row, col)
@@ -255,9 +257,9 @@ class Map:
         self.check_valid(row, col)
         return self.get_block_type(row, col) == 'P'
 
-    def is_corner(self, corner):
-        return corner in self.corners and \
-        self.corners.index(corner) != len(self.corners) - 1
+    def is_corner(self, coord):
+        return coord in self.corners and \
+        self.corners.index(coord) != len(self.corners) - 1
 
     def turn_direction (self, corner):
         if self.is_corner(corner):
@@ -287,18 +289,28 @@ class Map:
                     return True
         return False
 
+    # checks if a rectangle in on a corner block
+    def on_corner (self, rect, tolerance = 2):
+        for corner in self.corners:
+            if abs(self.to_pixel(corner)[0] - rect.topleft[0]) < tolerance and \
+            abs(self.to_pixel(corner)[1] - rect.topleft[1]) < tolerance:
+                return corner
+        return False
+
+
     # starting_point
     # Find the starting pointing of the path if it exists, must start from left side of screen (for now)
     # Void -> (Int, Int)
     def starting_point(self):
-        for index, row in enumerate(self.grid):
-            if row[0] == 'P':
-                if self.grid_size:
-                    return (0, index * self.grid_size)
-                else:
-                    return (index, 0)
-        print("No starting point found.")
-        return False
+        return self.to_pixel(self.corners[0])
+        # for index, row in enumerate(self.grid):
+        #     if row[0] == 'P':
+        #         if self.grid_size:
+        #             return (0, index * self.grid_size)
+        #         else:
+        #             return (index, 0)
+        # print("No starting point found.")
+        # return False
 
 
     # Draws Map

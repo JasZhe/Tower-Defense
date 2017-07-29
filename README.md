@@ -11,4 +11,4 @@
 - <kbd>P</kbd> - Decrease enemy spawn time
 - <kbd>H</kbd> - Increase enemy HP
 - <kbd>J</kbd> - Decrease enemy HP
-- <kbd>W S A D</kbd> - Controls enemy directions
+- <kbd>W</kbd><kbd>S</kbd><kbd>A</kbd><kbd>D</kbd> - Controls enemy directions

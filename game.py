@@ -54,8 +54,6 @@ from properties import *
 #       Circle is better * DONE
 
 #*************************************************************
-
-
 pygame.init() 
 
 # Mixer is for sounds
@@ -63,7 +61,7 @@ pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.mixer.init()
 
 # Map settings
-game_map = Map('map2.txt')
+game_map = Map('map3.txt')
 
 # Grid dimensions
 GRID_SIZE = game_map.grid_size
@@ -393,11 +391,14 @@ while True:
 
     # Draw enemy if still alive at the end of the frame
     for enemy in enemy_list:
+        corner_check = game_map.on_corner(enemy.body)
+        if corner_check:
+            enemy.turn(game_map.turn_direction(corner_check))
         pygame.draw.rect(screen, enemy.colour, enemy.body)
 
         # Enemy info
-        screen.blit(myfont.render("HP: %d/%d" % (enemy.hp, enemy.max_hp), 
-            1, (255, 255, 255)), enemy.body.bottomleft)
+        # screen.blit(myfont.render("HP: %d/%d" % (enemy.hp, enemy.max_hp), 
+        #     1, (255, 255, 255)), enemy.body.bottomleft)
 
         # HP Bar
         pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
