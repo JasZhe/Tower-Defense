@@ -17,9 +17,7 @@ class Player(object):
         self.gun_colour = gun_colour
 
     def update(self, x = 0, y = 0):
-
         # Make sure the player can't leave the screen. 
-
         if ((self.body.right >= self.screen_width and x > 0) or 
             (self.body.x <= 0 and x < 0)):
 
@@ -68,8 +66,12 @@ class Enemy(object):
             self.body.move_ip(self.velocity)
 
         # Return true if the enemy has left the screen or destroyed
-        def check_destroy(self):
-            if self.body.left >= self.screen_width or self.hp <= 0:
+        def check_destroy(self, percent_margin = 0.2):
+            if self.hp <= 0 \
+            or self.body.top > self.screen_height * (1 + percent_margin) \
+            or self.body.bottom < 0 - self.screen_height * percent_margin \
+            or self.body.left > self.screen_width * (1 + percent_margin) \
+            or self.body.right < 0 - self.screen_width * percent_margin:
                 return True
             else:
                 return False
@@ -103,20 +105,25 @@ class Enemy(object):
 
 
 class Bullet(object):
-    def __init__(self, speed, pos, colour, screen_height, width = 5, height = 20, damage = 10):
+    def __init__(self, speed, pos, colour, screen_height, screen_width, width = 5, height = 20, damage = 10):
         self.speed = speed
         # Inital position of the bullet ie. where the player made the shot 
         self.body = pygame.Rect(pos, (width, height))
         self.colour = colour 
         self.screen_height = screen_height 
+        self.screen_width = screen_width
         self.damage = damage
 
     def update(self):
         self.body.move_ip(self.speed) 
 
-    # Return true if the bullet leaves the screen 
-    def check_destroy(self):
-        if self.body.bottom >= self.screen_height:
+    # Return true if the bullet leaves the screen
+    # percent_margin is the the margin buffer outsize the view before it's destroyed
+    def check_destroy(self, percent_margin = 0.2):
+        if self.body.top > self.screen_height * (1 + percent_margin) \
+        or self.body.bottom < 0 - self.screen_height * percent_margin \
+        or self.body.left > self.screen_width * (1 + percent_margin) \
+        or self.body.right < 0 - self.screen_width * percent_margin:
             return True
         else:
             return False
@@ -200,26 +207,13 @@ class Map:
                     higher = max(self.corners[i][0], self.corners[i + 1][0])
                     for k in range (lower, higher):
                         self.grid[k][self.corners[i][1]] = 'P'
-        self.save_map()
-
-        # valid = True
-        # if len(map_file) > 0 and len(map_file[0]) > 0:
-        #     row_length = len(map_file[0])
-        #     for row in map_file:
-        #         if len(row) != row_length:
-        #             self.grid = 'Inconsistent row lengths.'
-        #             valid = False
-        #             break
-        #     if valid:
-        #         self.grid = map_file
-        # else:
-        #     self.grid = 'Invalid Map'
 
     def save_map(self, file_name = 'map_view.txt'):
         with open(file_name, 'w') as file:
             for row in self.grid:
                 file.write(str(row) + '\n')
             file.close()
+
     # Finds the length of the map
     def row_length(self):
         return len(self.grid[0])
@@ -275,9 +269,7 @@ class Map:
                 else:
                     return 'U'
             else:
-                print("Unexpected error")  
-        else:
-            print("Not a corner")
+                print("Unexpected error") 
 
     # checks if a rectangle object is on the path
     def on_path(self, rect):
@@ -303,15 +295,6 @@ class Map:
     # Void -> (Int, Int)
     def starting_point(self):
         return self.to_pixel(self.corners[0])
-        # for index, row in enumerate(self.grid):
-        #     if row[0] == 'P':
-        #         if self.grid_size:
-        #             return (0, index * self.grid_size)
-        #         else:
-        #             return (index, 0)
-        # print("No starting point found.")
-        # return False
-
 
     # Draws Map
     def draw (self, display, path_colour = WHITE):

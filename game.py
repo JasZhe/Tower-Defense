@@ -11,14 +11,13 @@ from properties import *
 # in order to fill some sort of requirement to build a tower
 #
 # *DONE* enemy health
-#
 # *DONE* a path that's not a straight line for the enemies to move in
 #
 # a timer for build time 
 #
 # player resources 
 #
-# tower build time -nah?
+# tower build time
 #
 # towet build cost
 #
@@ -61,7 +60,7 @@ pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.mixer.init()
 
 # Map settings
-game_map = Map('map3.txt')
+game_map = Map('map5.txt')
 
 # Grid dimensions
 GRID_SIZE = game_map.grid_size
@@ -86,13 +85,6 @@ enemy_size = (GRID_SIZE, GRID_SIZE)
 enemy_speed = RIGHT
 enemy_initial_hp = 100 
 enemy_max_hp = 100
-
-# Enemy pathing
-turn_size = (45, 45)
-enemy_turn_list = [(pygame.Rect((WIDTH / 4, HEIGHT / 2), turn_size), UP), 
-                   (pygame.Rect((WIDTH / 4, HEIGHT / 8), turn_size), RIGHT),
-                   (pygame.Rect((WIDTH - WIDTH / 4, HEIGHT / 8), turn_size), DOWN), 
-                   (pygame.Rect((WIDTH - WIDTH / 4, HEIGHT - HEIGHT / 4), turn_size), RIGHT)]
 
 # Bullet stuff 
 bullet_list = [] 
@@ -141,7 +133,7 @@ while True:
     # Every clock update the counter will increment by one, when spawn_time
     # ticks have passed an enemy will spawn. 
     if counter % spawn_time == 0:
-        enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED,
+        enemy_list.append(Enemy(pygame.Rect((enemy_start[0] - enemy_size[0], enemy_start[1]), enemy_size), RED,
                                 enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp))
 
     pressed = pygame.key.get_pressed()
@@ -187,10 +179,8 @@ while True:
                 h = SHOT_WIDTH
             bullet_list.append(Bullet(bullet_speed, 
                 coord_add(player.body.center, (
-                    -w/2, -h/2)), YELLOW, HEIGHT, w, h))
+                    -w/2, -h/2)), YELLOW, HEIGHT, WIDTH, w, h))
             last_shot = now
-            #bullet_speed = (bullet_speed[0] + 0.1, bullet_speed[1])
-           # print(bullet_speed)
 
     if pressed[pygame.K_t]:
         rand = random.randint(0,3)
@@ -278,12 +268,6 @@ while True:
     # Draws path
     game_map.draw(screen, GRAY)
 
-    
-    # This loop is just used to draw the blocks used to signal turns for the enemies
-    # comment out this loop when it's not needed anymore 
-    #for turn in enemy_turn_list:
-    #    pygame.draw.rect(screen, ORANGE, turn[0])
-
     for tower in tower_list:
         pygame.draw.rect(screen, tower.type, tower.body)
         
@@ -337,7 +321,7 @@ while True:
 
                     tower_bullets.append(
                         Bullet((tower.shell_speed * math.cos(angle), tower.shell_speed * math.sin(angle)),
-                         tower.body.center, YELLOW, HEIGHT, w, h, damage = tower.damage))
+                         tower.body.center, YELLOW, HEIGHT, WIDTH, w, h, damage = tower.damage))
                              
                 # now based on the tower damage specified in the properties file 
                 #enemy.hp = enemy.hp - tower.damage
@@ -395,6 +379,7 @@ while True:
         if corner_check:
             enemy.turn(game_map.turn_direction(corner_check))
         pygame.draw.rect(screen, enemy.colour, enemy.body)
+
 
         # Enemy info
         # screen.blit(myfont.render("HP: %d/%d" % (enemy.hp, enemy.max_hp), 

@@ -33,7 +33,7 @@ DOWN = (0, RATE)
 # Tower upgrades 
 # added upgrade_list
 tower_max_level = 7
-space_between = 70
+space_between = 40
 UPGRADE_DELAY = 300
 INITIAL_SIZE = (20, 20)
 upgrade_list = [GREEN, CYAN, BLUE, DARK_BLUE, YELLOW, ORANGE, MAGENTA, WHITE]

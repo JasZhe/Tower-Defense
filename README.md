@@ -1,6 +1,6 @@
 # Tower Defense game: Made with in Pygame
 **Controls:**
-- <kbd>Arrow Keys</kbd> - Player Movement
+- <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> - Player Movement
 - <kbd>Space</kbd> - Shoot
 - <kbd>T</kbd> - Place Tower at player's position
 - <kbd>U</kbd> - Upgrade tower that the player is on if sufficient amount of money
