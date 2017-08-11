@@ -11,14 +11,13 @@ from properties import *
 # in order to fill some sort of requirement to build a tower
 #
 # *DONE* enemy health
-#
 # *DONE* a path that's not a straight line for the enemies to move in
 #
 # a timer for build time 
 #
 # player resources 
 #
-# tower build time -nah?
+# tower build time
 #
 # towet build cost
 #
@@ -54,29 +53,38 @@ from properties import *
 #       Circle is better * DONE
 
 #*************************************************************
-
-
 pygame.init() 
 
 # Mixer is for sounds
 pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.mixer.init()
 
+# Map settings
+game_map = Map('map5.txt')
+
+# Grid dimensions
+GRID_SIZE = game_map.grid_size
+
+# Window size properties
+WIDTH = game_map.cols * GRID_SIZE #1080
+HEIGHT = game_map.rows * GRID_SIZE #720
+SIZE = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(SIZE) 
 clock = pygame.time.Clock()
 
-player = Player(pygame.Rect((10, 10), (30, 30)), BLUE, WIDTH, HEIGHT, 
+# Player info
+player = Player(pygame.Rect((10, 10), (GRID_SIZE, GRID_SIZE)), BLUE, WIDTH, HEIGHT, 
     TICK_SPEED / FRAME_RATE, TICK_SPEED / FRAME_RATE, gun_colour = YELLOW)
 
 # enemy stuff
 enemy_list = [] 
-
-# Enemy pathing
-turn_size = (45, 45)
-enemy_turn_list = [(pygame.Rect((WIDTH / 4, HEIGHT / 2), turn_size), UP), 
-                   (pygame.Rect((WIDTH / 4, HEIGHT / 8), turn_size), RIGHT),
-                   (pygame.Rect((WIDTH - WIDTH / 4, HEIGHT / 8), turn_size), DOWN), 
-                   (pygame.Rect((WIDTH - WIDTH / 4, HEIGHT - HEIGHT / 4), turn_size), RIGHT)]
+enemy_start = game_map.starting_point()
+counter = 0
+spawn_time = 50
+enemy_size = (GRID_SIZE, GRID_SIZE)
+enemy_speed = RIGHT
+enemy_initial_hp = 100 
+enemy_max_hp = 100
 
 # Bullet stuff 
 bullet_list = [] 
@@ -87,7 +95,6 @@ bullet_speed_y = 20
 bullet_speed = (bullet_speed_x, bullet_speed_y)
 
 # Tower stuff 
-# moved the tower stuff to properties 
 tower_list = [] 
 last_upgrade = 0 
 
@@ -105,11 +112,15 @@ rifle_gun = pygame.mixer.Sound(file="sounds/rifle_gun.wav")
 sniper_gun = pygame.mixer.Sound(file="sounds/sniper_gun.wav")
 machine_gun = pygame.mixer.Sound(file="sounds/machine_gun.wav")
 player_gun = pygame.mixer.Sound(file="sounds/player_gun.wav")
+heavy_gun = pygame.mixer.Sound(file="sounds/heavy_gun.wav")
+
+explode_sound = pygame.mixer.Sound(file="sounds/explode_sound.wav")
 
 tower_sounds = {
     "rifle" : rifle_gun,
     "sniper" : sniper_gun,
-    "machine_gun" : machine_gun
+    "machine_gun" : machine_gun,
+    "heavy" : heavy_gun
 }
 
 # Main Gameloop
@@ -122,13 +133,8 @@ while True:
     # Every clock update the counter will increment by one, when spawn_time
     # ticks have passed an enemy will spawn. 
     if counter % spawn_time == 0:
-        enemy_list.append(Enemy(pygame.Rect(enemy_start, enemy_size), RED,
+        enemy_list.append(Enemy(pygame.Rect((enemy_start[0] - enemy_size[0], enemy_start[1]), enemy_size), RED,
                                 enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp))
-
-    for enemy in enemy_list:
-        for turn in enemy_turn_list:
-            if enemy.body.colliderect(turn[0]):
-                enemy.speed = turn[1]
 
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_UP]:
@@ -148,6 +154,19 @@ while True:
         player.direction = "R"
         bullet_speed = (bullet_speed_y, bullet_speed_x)
 
+    if pressed[pygame.K_w]:
+        for enemy in enemy_list:
+            enemy.turn('U')
+    if pressed[pygame.K_s]:
+        for enemy in enemy_list:
+            enemy.turn('D')
+    if pressed[pygame.K_a]:
+        for enemy in enemy_list:
+            enemy.turn('L')
+    if pressed[pygame.K_d]:
+        for enemy in enemy_list:
+            enemy.turn('R')
+
     if pressed[pygame.K_SPACE]:
         now = pygame.time.get_ticks()
         if now - last_shot >= SHOT_DELAY:
@@ -160,25 +179,27 @@ while True:
                 h = SHOT_WIDTH
             bullet_list.append(Bullet(bullet_speed, 
                 coord_add(player.body.center, (
-                    -w/2, -h/2)), YELLOW, HEIGHT, w, h))
+                    -w/2, -h/2)), YELLOW, HEIGHT, WIDTH, w, h))
             last_shot = now
-            #bullet_speed = (bullet_speed[0] + 0.1, bullet_speed[1])
-           # print(bullet_speed)
 
     if pressed[pygame.K_t]:
-        rand = random.randint(0,2)
+        rand = random.randint(0,3)
         if rand == 0:
             tower_class = "rifle"
         elif rand == 1:
             tower_class = "sniper"
         elif rand == 2:
             tower_class = "machine_gun"
+        elif rand == 3:
+            tower_class = "heavy"
 
         temp = Tower((player.body.x, player.body.y),tower_class)
-        placeable = 1 
+        placeable = True
+        if game_map.on_path(player.body):
+            placeable = False
         for tower in tower_list:
             if distance(temp.body.center, tower.body.center) <= space_between: 
-                placeable = 0
+                placeable = False
                 break
         if placeable:
             tower_list.append(temp)
@@ -243,23 +264,22 @@ while True:
     screen.fill(BLACK) 
     screen.blit(label, (10, 10))
     
-    # This loop is just used to draw the blocks used to signal turns for the enemies
-    # comment out this loop when it's not needed anymore 
-    for turn in enemy_turn_list:
-        pygame.draw.rect(screen, ORANGE, turn[0])
+
+    # Draws path
+    game_map.draw(screen, GRAY)
 
     for tower in tower_list:
         pygame.draw.rect(screen, tower.type, tower.body)
         
         # view range only when player is in range
-        if distance(tower.body.center, player.body.center) <= tower.max_range:
+        if distance(tower.body.center, player.body.center) <= 40:
             pygame.draw.circle(screen, GREEN, tower.body.center, tower.max_range, 1)
 
         # Tower range
         for enemy in enemy_list:
             if distance(tower.body.center, enemy.body.center) <= tower.max_range:
                 # draws line to indicate hit for now
-                pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
+                #pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
 
                 if tower.canShoot():
                     pygame.mixer.Sound.play(tower_sounds[tower.tower_class])
@@ -268,13 +288,13 @@ while True:
                     quad = quadrant(tower.body, enemy.body)
 
                     # Vertical Case
-                    if enemy.speed[0] == 0:
+                    if enemy.velocity[0] == 0:
                         # Quadratic formula to calculate impact time
-                        time = quadratic_formula((enemy.speed[1]**2 - tower.shell_speed**2), 2.0*enemy.speed[1]*dy, dx**2 + dy**2)[1]
+                        time = quadratic_formula((enemy.velocity[1]**2 - tower.shell_speed**2), 2.0*enemy.velocity[1]*dy, dx**2 + dy**2)[1]
                         beta = math.acos(abs(dx / (tower.shell_speed * time)))
                     # Horizontal Case
                     else:
-                        time = quadratic_formula((enemy.speed[0]**2 - tower.shell_speed**2), 2.0*enemy.speed[0]*dx, dx**2 + dy**2)[1]
+                        time = quadratic_formula((enemy.velocity[0]**2 - tower.shell_speed**2), 2.0*enemy.velocity[0]*dx, dx**2 + dy**2)[1]
                         beta = math.asin(abs(dy / (tower.shell_speed * time)))
 
                     # CAST rule accomodations
@@ -288,15 +308,20 @@ while True:
                         angle = 2.0 * math.pi - beta
 
                     if tower.tower_class == "machine_gun":
-                        dispersion = random.randint(-12, 12) / 100.0
+                        dispersion = random.randint(-15, 15) / 100.0
                         angle += dispersion
 
-
+                    if tower.tower_class == "heavy":
+                        w = 15
+                        h = 15
+                    else:
+                        w = 5
+                        h = 5
 
 
                     tower_bullets.append(
                         Bullet((tower.shell_speed * math.cos(angle), tower.shell_speed * math.sin(angle)),
-                         tower.body.center, YELLOW, HEIGHT, width = 5, height = 5, damage = tower.damage))
+                         tower.body.center, YELLOW, HEIGHT, WIDTH, w, h, damage = tower.damage))
                              
                 # now based on the tower damage specified in the properties file 
                 #enemy.hp = enemy.hp - tower.damage
@@ -329,12 +354,20 @@ while True:
     for enemy in enemy_list:
         for bullet in bullet_list:
             if bullet.body.colliderect(enemy.body):
-                enemy.hp = enemy.hp - SHOT_DMG
+                enemy.hp = max(enemy.hp - SHOT_DMG, 0)
                 bullet_list.remove(bullet)
         for bullet in tower_bullets:
             if bullet.body.colliderect(enemy.body):
-                enemy.hp = enemy.hp - bullet.damage
+                enemy.hp = max(enemy.hp - bullet.damage, 0)
                 tower_bullets.remove(bullet)
+
+                # AOE weapon
+                if bullet.body.width == 15:
+                    pygame.mixer.Sound.play(explode_sound)
+                    for enemy in enemy_list:
+                        if distance(bullet.body.center, enemy.body.center) <= 100:
+                            enemy.hp = max(enemy.hp - bullet.damage * \
+                            1 / (1 + math.sqrt(distance(bullet.body.center, enemy.body.center))/30),0)
 
         if enemy.check_destroy():
             enemy_list.remove(enemy)
@@ -342,15 +375,18 @@ while True:
 
     # Draw enemy if still alive at the end of the frame
     for enemy in enemy_list:
+        corner_check = game_map.on_corner(enemy.body)
+        if corner_check:
+            enemy.turn(game_map.turn_direction(corner_check))
         pygame.draw.rect(screen, enemy.colour, enemy.body)
 
+
         # Enemy info
-        screen.blit(myfont.render("HP: %d/%d" % (enemy.hp, enemy.max_hp), 
-            1, (255, 255, 255)), enemy.body.bottomleft)
+        # screen.blit(myfont.render("HP: %d/%d" % (enemy.hp, enemy.max_hp), 
+        #     1, (255, 255, 255)), enemy.body.bottomleft)
 
         # HP Bar
         pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
-        #pygame.Rect((10, height / 2), (30, 30))
 
         color = BLACK
         if enemy.hp > 0:
@@ -360,7 +396,7 @@ while True:
                 colour = ORANGE
             else:
                 colour = RED
-       # pygame.draw.rect(gameDisplay, colour, [ship_X, ship_Y + shipSize - 5, shipSize * hp / 100, 8])
+      
         pygame.draw.rect(screen, colour, 
             [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
         enemy.update()
