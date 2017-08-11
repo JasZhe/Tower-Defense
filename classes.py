@@ -76,6 +76,9 @@ class Enemy(object):
             else:
                 return False
 
+        def breach(self, percent_margin  = 0.2):
+            return self.hp > 0 and self.check_destroy(percent_margin)
+
         # get_direction()
         # returns the direction that the enemy is going
         # Void -> One of ['U', 'D', 'L', 'R']
@@ -304,3 +307,59 @@ class Map:
             for col in range(0, col_count):
                 if self.is_path(row, col):
                     pygame.draw.rect(display, path_colour, [col * self.grid_size, row * self.grid_size, self.grid_size, self.grid_size])
+
+
+class HP_Bar:
+    def __init__(self, max_hp = 100, x = 0, y = 0, width = 200, height = 20, 
+                colour_high = (0, 255, 0), colour_med = (255, 153, 51), colour_low = (255, 51, 51)):
+        self.max_hp = max_hp
+        self.hp = max_hp
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.colour_high = colour_high
+        self.colour_med = colour_med
+        self.colour_low = colour_low
+
+    def increase_hp(self, value):
+        self.hp = min(self.max_hp, self.hp + value)
+
+    def decrease_hp(self, value):
+        self.hp = max(0, self.hp - value)
+
+    def set_hp(self, value):
+        self.hp = value
+        self.max_hp = max(self.max_hp, value)
+
+    def increase_max_hp(self, value):
+        self.max_hp = self.max_hp + value
+
+    def decrease_max_hp(self, value):
+        self.max_hp = max(0, self.max_hp - value)
+        self.hp = min(self.max_hp, self.hp)
+
+    def is_empty(self):
+        return self.hp <= 0
+
+    def percent_hp(self):
+        if self.max_hp != 0:
+            return round(float(self.hp) / self.max_hp, 2)
+        return None
+
+    def replenish(self):
+        self.set_hp(self.max_hp)
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
+        if not self.is_empty():
+            percent = self.percent_hp()
+            colour = None
+            if percent > 0.5:
+                colour = self.colour_high
+            elif percent > 0.3:
+                colour = self.colour_med
+            else:
+                colour = self.colour_low
+            pygame.draw.rect(screen, colour, [self.x, self.y, int(self.width * percent), self.height])
+
