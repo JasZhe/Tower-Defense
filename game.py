@@ -75,6 +75,7 @@ clock = pygame.time.Clock()
 # Player info
 player = Player(pygame.Rect((10, 10), (GRID_SIZE, GRID_SIZE)), BLUE, WIDTH, HEIGHT, 
     TICK_SPEED / FRAME_RATE, TICK_SPEED / FRAME_RATE, gun_colour = YELLOW)
+master_hp = HP_Bar(100, 0, HEIGHT - 15, WIDTH, 15)
 
 # enemy stuff
 enemy_list = [] 
@@ -128,7 +129,18 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             pygame.quit()
-            sys.exit() 
+            sys.exit()
+
+        # keyboard press, no holding down
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_MINUS:
+                master_hp.decrease_hp(10)
+            if event.key == pygame.K_EQUALS:
+                master_hp.increase_hp(10)
+            if event.key == pygame.K_0:
+                master_hp.increase_max_hp(10)
+            if event.key == pygame.K_9:
+                master_hp.decrease_max_hp(10)
 
     # Every clock update the counter will increment by one, when spawn_time
     # ticks have passed an enemy will spawn. 
@@ -396,7 +408,8 @@ while True:
                 colour = ORANGE
             else:
                 colour = RED
-      
+
+        master_hp.draw(screen)
         pygame.draw.rect(screen, colour, 
             [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
         enemy.update()
