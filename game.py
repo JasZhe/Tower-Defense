@@ -381,9 +381,11 @@ while True:
                             enemy.hp = max(enemy.hp - bullet.damage * \
                             1 / (1 + math.sqrt(distance(bullet.body.center, enemy.body.center))/30),0)
 
-        if enemy.check_destroy():
+        if enemy.breach():
+            master_hp.decrease_hp(10)
             enemy_list.remove(enemy)
-
+        elif enemy.check_destroy():
+            enemy_list.remove(enemy)
 
     # Draw enemy if still alive at the end of the frame
     for enemy in enemy_list:

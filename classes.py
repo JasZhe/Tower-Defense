@@ -76,6 +76,9 @@ class Enemy(object):
             else:
                 return False
 
+        def breach(self, percent_margin  = 0.2):
+            return self.hp > 0 and self.check_destroy(percent_margin)
+
         # get_direction()
         # returns the direction that the enemy is going
         # Void -> One of ['U', 'D', 'L', 'R']
