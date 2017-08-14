@@ -2,6 +2,7 @@ import pygame, sys
 from functions import *
 from properties import * 
 from classes import *
+from bullets import * 
 
 class Tower(object):
     def __init__(self, pos): #, tower_class = "rifle"):
@@ -157,7 +158,9 @@ class Sniper_Tower(Tower):
 
     
     def shoot(self, enemy, HEIGHT, WIDTH):
-        bullet = super(Sniper_Tower, self).shoot(enemy, HEIGHT, WIDTH) 
+        bullet = super(Sniper_Tower, self).shoot(enemy, HEIGHT, WIDTH)
+        if bullet is not None:
+            bullet = Sniper_Bullet(bullet)
         return bullet 
     
 
@@ -259,6 +262,7 @@ class HeavyGun_Tower(Tower):
         bullet = super(HeavyGun_Tower, self).shoot(enemy, HEIGHT, WIDTH)
 
         if bullet is not None: 
+            bullet = Heavy_Bullet(bullet)
             bullet.body.width = 15
             bullet.body.height = 15
             return bullet 

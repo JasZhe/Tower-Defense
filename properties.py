@@ -1,3 +1,4 @@
+import pygame, sys
 # Game properties can be changed/added here
 
 # Colours
@@ -12,6 +13,26 @@ MAGENTA = (255, 0, 255)
 DARK_BLUE = (0, 30, 205)
 CYAN = (0, 255, 255)
 GRAY = (100, 100, 100)
+
+# Mixer is for sounds
+pygame.mixer.pre_init(44100, -16, 2, 2048)
+pygame.mixer.init()
+
+# Sounds
+rifle_gun = pygame.mixer.Sound(file="sounds/rifle_gun.wav")
+sniper_gun = pygame.mixer.Sound(file="sounds/sniper_gun.wav")
+machine_gun = pygame.mixer.Sound(file="sounds/machine_gun.wav")
+player_gun = pygame.mixer.Sound(file="sounds/player_gun.wav")
+heavy_gun = pygame.mixer.Sound(file="sounds/heavy_gun.wav")
+
+explode_sound = pygame.mixer.Sound(file="sounds/explode_sound.wav")
+
+tower_sounds = {
+    "rifle" : rifle_gun,
+    "sniper" : sniper_gun,
+    "machine_gun" : machine_gun,
+    "heavy" : heavy_gun
+}
 
 # Timing constants 
 FRAME_RATE = 30
@@ -37,102 +58,3 @@ space_between = 40
 UPGRADE_DELAY = 300
 INITIAL_SIZE = (20, 20)
 upgrade_list = [GREEN, CYAN, BLUE, DARK_BLUE, YELLOW, ORANGE, MAGENTA, WHITE]
-
-
-rifle_stats = {
-	"damage" : {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
-					MAGENTA : 55, WHITE : 60},
-
-	"cost" : {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORANGE : 40,
-					MAGENTA : 60, WHITE : 80},
-
-	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
-				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
-
-	"range" : {GREEN : 180, CYAN : 190, BLUE : 200, DARK_BLUE : 210, YELLOW : 220, ORANGE : 230,
-					MAGENTA : 240, WHITE : 250},
-
-	"reload": 30,
-
-
-	"shell_speed": 20
-}
-
-sniper_stats = {
-	"damage" : {GREEN : 80, CYAN : 90, BLUE : 100, DARK_BLUE : 120, YELLOW : 140, ORANGE : 160,
-					MAGENTA : 180, WHITE : 200},
-
-	"cost" : {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
-					MAGENTA : 600, WHITE : 800},
-
-	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
-				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
-
-	"range" : {GREEN : 240, CYAN : 260, BLUE : 280, DARK_BLUE : 300, YELLOW : 310, ORANGE : 320,
-					MAGENTA : 330, WHITE : 340},
-
-	"reload": 90,
-
-
-	"shell_speed": 30
-
-}
-
-machine_gun_stats = {
-	"damage" : {GREEN : 5, CYAN : 6, BLUE : 7, DARK_BLUE : 8, YELLOW : 9, ORANGE : 10,
-					MAGENTA : 12, WHITE : 14},
-
-	"cost" : {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
-					MAGENTA : 600, WHITE : 800},
-
-	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
-				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
-
-	"range" : {GREEN : 170, CYAN : 180, BLUE : 190, DARK_BLUE : 200, YELLOW : 210, ORANGE : 220,
-					MAGENTA : 230, WHITE : 240},
-
-	"reload": 4,
-	
-
-	"shell_speed": 15
-
-}
-
-heavy_gun_stats = {
-	"damage" : {GREEN : 60, CYAN : 70, BLUE : 80, DARK_BLUE : 90, YELLOW : 100, ORANGE : 120,
-					MAGENTA : 140, WHITE : 160},
-
-	"cost" : {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
-					MAGENTA : 600, WHITE : 800},
-
-	"inflation" : {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
-				  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)},
-
-	"range" : {GREEN : 250, CYAN : 260, BLUE : 270, DARK_BLUE : 280, YELLOW : 300, ORANGE : 320,
-					MAGENTA : 340, WHITE : 360},
-
-	"reload": 120,
-	
-
-	"shell_speed": 10
-
-}
-
-tower_classes = {
-	"rifle": rifle_stats, 
-	"sniper": sniper_stats, 
-	"machine_gun": machine_gun_stats, 
-	"heavy": heavy_gun_stats
-}
-
-# tower_damage = {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
-# 				MAGENTA : 55, WHITE : 60}
-
-# tower_cost = {GREEN : 5, CYAN : 10, BLUE : 15, DARK_BLUE : 20, YELLOW : 30, ORANGE : 40,
-# 				MAGENTA : 60, WHITE : 80}
-
-# tower_inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
-# 			  YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
-
-# tower_range = {GREEN : 180, CYAN : 190, BLUE : 200, DARK_BLUE : 210, YELLOW : 220, ORANGE : 230,
-# 				MAGENTA : 240, WHITE : 250}

@@ -48,63 +48,63 @@ class Player(object):
             pygame.draw.rect(screen, self.gun_colour, 
             pygame.Rect(coord_add(self.body.topright, (0,  (self.body.height - self.gun_size)/2)), 
                 (self.gun_size, self.gun_size)))
-
+"""
 class Enemy(object):
-        # Add health 
-        def __init__(self, body, colour, velocity, screen_width, screen_height, hp, max_hp = 100):
+    # Add health 
+    def __init__(self, body, colour, velocity, screen_width, screen_height, hp, max_hp = 100):
 
-            self.body = body 
-            self.velocity = velocity # Tuple (v_x, v_y)
-            self.colour = colour 
-            self.screen_width = screen_width
-            self.screen_height = screen_height
-            self.hp = hp
-            self.max_hp = max_hp
+        self.body = body 
+        self.velocity = velocity # Tuple (v_x, v_y)
+        self.colour = colour 
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.hp = hp
+        self.max_hp = max_hp
 
 
-        def update(self):
-            self.body.move_ip(self.velocity)
+    def update(self):
+        self.body.move_ip(self.velocity)
 
-        # Return true if the enemy has left the screen or destroyed
-        def check_destroy(self, percent_margin = 0.2):
-            if self.hp <= 0 \
-            or self.body.top > self.screen_height * (1 + percent_margin) \
-            or self.body.bottom < 0 - self.screen_height * percent_margin \
-            or self.body.left > self.screen_width * (1 + percent_margin) \
-            or self.body.right < 0 - self.screen_width * percent_margin:
-                return True
+    # Return true if the enemy has left the screen or destroyed
+    def check_destroy(self, percent_margin = 0.2):
+        if self.hp <= 0 \
+        or self.body.top > self.screen_height * (1 + percent_margin) \
+        or self.body.bottom < 0 - self.screen_height * percent_margin \
+        or self.body.left > self.screen_width * (1 + percent_margin) \
+        or self.body.right < 0 - self.screen_width * percent_margin:
+            return True
+        else:
+            return False
+
+    def breach(self, percent_margin  = 0.2):
+        return self.hp > 0 and self.check_destroy(percent_margin)
+
+    # get_direction()
+    # returns the direction that the enemy is going
+    # Void -> One of ['U', 'D', 'L', 'R']
+    def get_direction(self):
+        if self.velocity[0] == 0:
+            if self.velocity[1] > 0:
+                return 'D'
             else:
-                return False
-
-        def breach(self, percent_margin  = 0.2):
-            return self.hp > 0 and self.check_destroy(percent_margin)
-
-        # get_direction()
-        # returns the direction that the enemy is going
-        # Void -> One of ['U', 'D', 'L', 'R']
-        def get_direction(self):
-            if self.velocity[0] == 0:
-                if self.velocity[1] > 0:
-                    return 'D'
-                else:
-                    return 'U'
-            elif self.velocity[0] > 0:
-                return 'R'
-            else:
-                return 'L'
-        # turn
-        # Changes the direction that the enemy is going
-        # One of ['U', 'D', 'L', 'R'] -> Void
-        def turn(self, direction):
-            speed = max(abs(self.velocity[0]), abs(self.velocity[1]))
-            if direction == 'U':
-                self.velocity = (0, -speed)
-            elif direction == 'D':
-                self.velocity = (0, speed)
-            elif direction == 'L':
-                self.velocity = (-speed, 0)
-            elif direction == 'R':
-                self.velocity = (speed, 0)
+                return 'U'
+        elif self.velocity[0] > 0:
+            return 'R'
+        else:
+            return 'L'
+    # turn
+    # Changes the direction that the enemy is going
+    # One of ['U', 'D', 'L', 'R'] -> Void
+    def turn(self, direction):
+        speed = max(abs(self.velocity[0]), abs(self.velocity[1]))
+        if direction == 'U':
+            self.velocity = (0, -speed)
+        elif direction == 'D':
+            self.velocity = (0, speed)
+        elif direction == 'L':
+            self.velocity = (-speed, 0)
+        elif direction == 'R':
+            self.velocity = (speed, 0)
 
 
 class Bullet(object):
@@ -130,6 +130,7 @@ class Bullet(object):
             return True
         else:
             return False
+"""
 
 # Class for the game map
 # Constructor: listOf(listOf(Int))
