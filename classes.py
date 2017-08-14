@@ -131,43 +131,6 @@ class Bullet(object):
         else:
             return False
 
-class Tower(object):
-    def __init__(self, pos, tower_class = "rifle"):
-        # moved space_between to properties
-        # shellSpeed should be >= 10, anything smaller will create rounding inaccuracies
-        self.pos = pos 
-        self.level = 0
-        self.tower_class = tower_class      
-        self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
-        self.max_range = tower_classes[self.tower_class]["range"][self.type]  # Range is the radius 
-        self.damage = tower_classes[self.tower_class]["damage"][self.type]
-        self.cost = tower_classes[self.tower_class]["damage"][self.type]
-        self.body = pygame.Rect(self.pos, INITIAL_SIZE)
-        self.reload = tower_classes[self.tower_class]["reload"]
-        self.shell_speed = tower_classes[self.tower_class]["shell_speed"]
-        self.time = 0
-
-
-    def upgrade(self):
-        self.level = self.level + 1         
-        self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
-        self.max_range = tower_classes[self.tower_class]["range"][self.type]  # Range is the radius 
-        self.damage = tower_classes[self.tower_class]["damage"][self.type]
-        self.cost = tower_classes[self.tower_class]["damage"][self.type]
-        self.body.inflate_ip(tower_classes[self.tower_class]["inflation"][self.type])
-
-    # shoots at enemy when time is right
-    def canShoot(self):
-        if self.time % self.reload == 0:
-            self.time = 0
-            return True
-        else:
-            return False
-
-    # Calculates damage rate (Damage Per Frame)
-    def dpm(self):
-        return self.damage / self.reload
-
 # Class for the game map
 # Constructor: listOf(listOf(Int))
 # Requires: Each list must be the same length
