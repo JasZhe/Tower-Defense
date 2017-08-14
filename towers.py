@@ -12,8 +12,7 @@ class Tower(object):
         self.type =  upgrade_list[self.level] # Each tower type will have a different colour  
         self.body = pygame.Rect(self.pos, INITIAL_SIZE)
         self.time = 0
-        self.angle = 0
-        self.bullet = 0
+        self.angle = 0 #bullet angle 
 
     def upgrade(self):
         self.level = self.level + 1         
@@ -32,7 +31,7 @@ class Tower(object):
             pygame.mixer.Sound.play(self.sound)
             dx = enemy.body.center[0] - self.body.center[0]
             dy = enemy.body.center[1] - self.body.center[1]
-            quad = quadrant(self.body, self.body)
+            quad = quadrant(self.body, enemy.body)
 
             # Vertical Case
             if enemy.velocity[0] == 0:
@@ -49,7 +48,7 @@ class Tower(object):
                 self.angle = beta
             elif quad == 2:
                 self.angle = math.pi - beta
-            elif self.quad == 3:
+            elif quad == 3:
                 self.angle = math.pi + beta 
             else:
                 self.angle = 2.0 * math.pi - beta
@@ -57,14 +56,11 @@ class Tower(object):
             w = 5
             h = 5
 
-            self.bullet = Bullet((self.shell_speed * math.cos(self.angle), self.shell_speed * math.sin(self.angle)),
+            bullet = Bullet((self.shell_speed * math.cos(self.angle), self.shell_speed * math.sin(self.angle)),
                  self.body.center, YELLOW, HEIGHT, WIDTH, w, h, damage = self.damage)
 
-            if self.bullet is None:
-                print "WhatT"
-            else:
-                print "works"
-                return self.bullet 
+            return bullet 
+
 
 class Rifle_Tower(Tower): 
 
@@ -94,11 +90,11 @@ class Rifle_Tower(Tower):
         self.sound = pygame.mixer.Sound(file="sounds/rifle_gun.wav")
 
     def upgrade(self): 
-        super(MachineGun_Tower, self).upgrade() 
+        super(Rifle_Tower, self).upgrade() 
         self.max_range = self.att_range[self.type] 
-        self.damage = self.damage[self.type]
-        self.cost = self.cost[self.type] 
-        self.body = inflate_ip(inflation[self.type])
+        self.damage = self.damage_levels[self.type]
+        self.cost = self.cost_levels[self.type] 
+        self.body.inflate_ip(self.inflation[self.type])
 
     def canShoot(self):
         if self.time % self.reload_speed == 0:
@@ -111,14 +107,9 @@ class Rifle_Tower(Tower):
         return self.damage / self.reload_speed
 
     def shoot(self, enemy, HEIGHT, WIDTH):
-        #bullet = 
-        super(Rifle_Tower, self).shoot(enemy, HEIGHT, WIDTH)
-        foo = super(Rifle_Tower, self).foo()
+        bullet = super(Rifle_Tower, self).shoot(enemy, HEIGHT, WIDTH)
+        return bullet
 
-        if self.bullet is None:
-            print "WhatR"
-        else:
-            return self.bullet
 
 class Sniper_Tower(Tower): 
 
@@ -150,9 +141,9 @@ class Sniper_Tower(Tower):
     def upgrade(self): 
         super(Sniper_Tower, self).upgrade() 
         self.max_range = self.att_range[self.type] 
-        self.damage = self.damage[self.type]
-        self.cost = self.cost[self.type] 
-        self.body = inflate_ip(inflation[self.type])
+        self.damage = self.damage_levels[self.type]
+        self.cost = self.cost_levels[self.type] 
+        self.body.inflate_ip(self.inflation[self.type])
 
     def canShoot(self):
         if self.time % self.reload_speed == 0:
@@ -164,14 +155,11 @@ class Sniper_Tower(Tower):
     def dpm(self):
         return self.damage / self.reload_speed
 
+    
     def shoot(self, enemy, HEIGHT, WIDTH):
-        #bullet = 
-        super(Sniper_Tower, self).shoot(enemy, HEIGHT, WIDTH) 
-
-        if self.bullet is None:
-            print "WhatS"
-        else:
-            return self.bullet 
+        bullet = super(Sniper_Tower, self).shoot(enemy, HEIGHT, WIDTH) 
+        return bullet 
+    
 
 class MachineGun_Tower(Tower): 
     damage_levels = {GREEN : 5, CYAN : 6, BLUE : 7, DARK_BLUE : 8, YELLOW : 9, ORANGE : 10, MAGENTA : 12, WHITE : 14}
@@ -198,9 +186,9 @@ class MachineGun_Tower(Tower):
     def upgrade(self): 
         super(MachineGun_Tower, self).upgrade() 
         self.max_range = self.att_range[self.type] 
-        self.damage = self.damage[self.type]
-        self.cost = self.cost[self.type] 
-        self.body = inflate_ip(inflation[self.type])
+        self.damage = self.damage_levels[self.type]
+        self.cost = self.cost_levels[self.type] 
+        self.body.inflate_ip(self.inflation[self.type])
 
     def canShoot(self):
         if self.time % self.reload_speed == 0:
@@ -213,16 +201,13 @@ class MachineGun_Tower(Tower):
         return self.damage / self.reload_speed
 
     def shoot(self, enemy, HEIGHT, WIDTH):
-        dispersion = random.randint(-15, 15) / 100.0
-        self.angle += dispersion
+        bullet = super(MachineGun_Tower, self).shoot(enemy, HEIGHT, WIDTH)
 
-        #bullet = 
-        super(MachineGun_Tower, self).shoot(enemy, HEIGHT, WIDTH)
-        if self.bullet is None:
-            print "WhatM"
-        else:
-            self.bullet.speed = (self.shell_speed * math.cos(self.angle), self.shell_speed * math.sin(self.angle))
-            return self.bullet 
+        if bullet is not None: 
+            dispersion = random.randint(-15, 15) / 100.0
+            self.angle += dispersion
+            bullet.speed = (self.shell_speed * math.cos(self.angle), self.shell_speed * math.sin(self.angle))
+            return bullet 
 
 
 class HeavyGun_Tower(Tower): 
@@ -253,11 +238,11 @@ class HeavyGun_Tower(Tower):
         self.sound = pygame.mixer.Sound(file="sounds/heavy_gun.wav")
 
     def upgrade(self): 
-        super(MachineGun_Tower, self).upgrade() 
+        super(HeavyGun_Tower, self).upgrade() 
         self.max_range = self.att_range[self.type] 
-        self.damage = self.damage[self.type]
-        self.cost = self.cost[self.type] 
-        self.body = inflate_ip(inflation[self.type])
+        self.damage = self.damage_levels[self.type]
+        self.cost = self.cost_levels[self.type] 
+        self.body.inflate_ip(self.inflation[self.type])
 
     def canShoot(self):
         if self.time % self.reload_speed == 0:
@@ -269,13 +254,11 @@ class HeavyGun_Tower(Tower):
     def dpm(self):
         return self.damage / self.reload_speed
 
-    def shoot(self, enemy, HEIGHT, WIDTH): 
-        #bullet = 
-        super(HeavyGun_Tower, self).shoot(enemy, HEIGHT, WIDTH)
 
-        if self.bullet is None:
-            print "WhatH"
-        else:
-            self.bullet.body.width = 15
-            self.bullet.body.height = 15
-            return self.bullet 
+    def shoot(self, enemy, HEIGHT, WIDTH): 
+        bullet = super(HeavyGun_Tower, self).shoot(enemy, HEIGHT, WIDTH)
+
+        if bullet is not None: 
+            bullet.body.width = 15
+            bullet.body.height = 15
+            return bullet 

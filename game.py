@@ -293,7 +293,8 @@ while True:
                 # draws line to indicate hit for now
                 #pygame.draw.lines(screen, RED, False, [tower.body.center, enemy.body.center], 2)
                 bullet = tower.shoot(enemy, HEIGHT, WIDTH)
-                tower_bullets.append(bullet)
+                if bullet is not None:  
+                    tower_bullets.append(bullet)
                              
                 # now based on the tower damage specified in the properties file 
                 #enemy.hp = enemy.hp - tower.damage
