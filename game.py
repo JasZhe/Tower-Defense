@@ -185,7 +185,7 @@ while True:
             last_shot = now
 
     if pressed[pygame.K_t]:
-        rand = random.randint(3,3)
+        rand = 1#random.randint(0,3)
         if rand == 0:
             temp = Rifle_Tower((player.body.x, player.body.y))
         elif rand == 1:
@@ -326,9 +326,14 @@ while True:
                     for enemy in enemy_list:
                         enemy.damage(bullet) 
                     tower_bullets.remove(bullet) 
+                elif type(bullet) is Sniper_Bullet: # sniper bullets penetrate 
+                    enemy.damage(bullet)
+                    bullet.hits_left -= 1 
+
+                    if bullet.hits_left == 0:
+                        tower_bullets.remove(bullet) 
                 else:
                     enemy.damage(bullet)
-                    tower_bullets.remove(bullet) 
 
         if enemy.breach():
             master_hp.decrease_hp(10)

@@ -28,6 +28,8 @@ class Bullet(object):
 
 
 class Sniper_Bullet(Bullet):
+
+    penetration = 2
     def __init__(self, bullet):
         self.speed = bullet.speed
         self.body = bullet.body
@@ -35,6 +37,7 @@ class Sniper_Bullet(Bullet):
         self.screen_height = bullet.screen_height
         self.screen_width = bullet.screen_width
         self.damage = bullet.damage 
+        self.hits_left = self.penetration
 
 
 class Heavy_Bullet(Bullet):
