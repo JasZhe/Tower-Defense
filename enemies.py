@@ -65,12 +65,12 @@ class Enemy(object):
 
         # if bullet collides with enemy, subtract the damage of the bullet from hp 
         def damage(self, bullet):
-            explosion_radius = 200
+            explosion_radius = 60
 
             if type(bullet) is Heavy_Bullet:
                 if distance(bullet.body.center, self.body.center) <= explosion_radius:
                     self.hp = max(self.hp - bullet.damage * \
-                                1 / (1 + math.sqrt(distance(bullet.body.center, self.body.center))/30),0)
+                                1 / (1 + distance(bullet.body.center, self.body.center) /explosion_radius),0)
 
             else:
                 self.hp = max(self.hp - bullet.damage, 0)
@@ -99,7 +99,7 @@ class Shield_Enemy(Enemy):
             if type(bullet) is Heavy_Bullet:
                 if distance(bullet.body.center, self.body.center) <= 100:
                         self.shield_hp = max(self.shield_hp - bullet.damage * \
-                                    1 / (1 + math.sqrt(distance(bullet.body.center, self.body.center))/30), 0)
+                                    1 / (1 + distance(bullet.body.center, self.body.center)/60), 0)
             else:
                 self.shield_hp = max(self.shield_hp - (2 * bullet.damage), 0)
         

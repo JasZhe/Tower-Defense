@@ -185,7 +185,7 @@ while True:
             last_shot = now
 
     if pressed[pygame.K_t]:
-        rand = 1#random.randint(0,3)
+        rand = random.randint(0,3)
         if rand == 0:
             temp = Rifle_Tower((player.body.x, player.body.y))
         elif rand == 1:
@@ -323,6 +323,7 @@ while True:
                 # AOE weapon
                 if type(bullet) is Heavy_Bullet: # bullet hit, then explodes because it's aoe bullet 
                     pygame.mixer.Sound.play(explode_sound)
+                    pygame.draw.circle(screen, RED, bullet.body.center, 60, 1)
                     for enemy in enemy_list:
                         enemy.damage(bullet) 
                     tower_bullets.remove(bullet) 
@@ -334,6 +335,7 @@ while True:
                         tower_bullets.remove(bullet) 
                 else:
                     enemy.damage(bullet)
+                    tower_bullets.remove(bullet)
 
         if enemy.breach():
             master_hp.decrease_hp(10)
@@ -365,14 +367,14 @@ while True:
 
         if type(enemy) is Shield_Enemy:
             pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
-            pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 10, enemy.body.width, 5])
-
-            master_hp.draw(screen)
+            
             pygame.draw.rect(screen, colour, 
                 [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
 
-            pygame.draw.rect(screen, WHITE,
-                [enemy.body.x, enemy.body.y + enemy.body.height - 10, enemy.body.width * enemy.shield_hp / enemy.max_shield, 5])
+            if enemy.shield_hp > 0:
+                #pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 10, enemy.body.width, 5])
+                pygame.draw.rect(screen, WHITE,
+                    [enemy.body.x, enemy.body.y + enemy.body.height - 10, enemy.body.width * enemy.shield_hp / enemy.max_shield, 5])
         else:
             pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
             pygame.draw.rect(screen, colour, 
@@ -380,6 +382,7 @@ while True:
 
         enemy.update()
 
+    master_hp.draw(screen)
     pygame.display.update()
     clock.tick(FRAME_RATE)
     counter = counter + 1 

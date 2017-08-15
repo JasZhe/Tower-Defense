@@ -21,11 +21,11 @@ class Tower(object):
 
     # shoots at enemy when time is right
     def canShoot(self):
-        print "undefined"
+        pass
 
     # Calculates damage rate (Damage Per Frame)
     def dpm(self):
-        print "undefined"
+        pass
 
     def shoot(self, enemy, HEIGHT, WIDTH): 
         if self.canShoot():
@@ -65,8 +65,8 @@ class Tower(object):
 
 class Rifle_Tower(Tower): 
 
-    damage_levels = {GREEN : 5, CYAN : 6, BLUE : 7, DARK_BLUE : 8, YELLOW : 9, ORANGE : 10,
-                MAGENTA : 12, WHITE : 14}
+    damage_levels = {GREEN : 25, CYAN : 30, BLUE : 35, DARK_BLUE : 40, YELLOW : 45, ORANGE : 50,
+                MAGENTA : 60, WHITE : 70}
 
     cost_levels = {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
                 MAGENTA : 600, WHITE : 800}
@@ -74,10 +74,10 @@ class Rifle_Tower(Tower):
     inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
                 YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
 
-    att_range = {GREEN : 240, CYAN : 260, BLUE : 280, DARK_BLUE : 300, YELLOW : 310, ORANGE : 320,
-                MAGENTA : 330, WHITE : 340}
+    att_range = {GREEN : 140, CYAN : 160, BLUE : 180, DARK_BLUE : 200, YELLOW : 210, ORANGE : 220,
+                MAGENTA : 220, WHITE : 240}
 
-    reload_speed = 4
+    reload_speed = 30
 
     shell_speed = 15
 
@@ -124,7 +124,7 @@ class Sniper_Tower(Tower):
                 YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
 
     att_range = {GREEN : 240, CYAN : 260, BLUE : 280, DARK_BLUE : 300, YELLOW : 310, ORANGE : 320,
-                MAGENTA : 330, WHITE : 340}
+                MAGENTA : 330, WHITE : 640}
 
     reload_speed = 90
 
@@ -171,7 +171,7 @@ class MachineGun_Tower(Tower):
 
     inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
 
-    att_range = {GREEN : 240, CYAN : 260, BLUE : 280, DARK_BLUE : 300, YELLOW : 310, ORANGE : 320, MAGENTA : 330, WHITE : 340}
+    att_range = {GREEN : 100, CYAN : 120, BLUE : 140, DARK_BLUE : 160, YELLOW : 180, ORANGE : 200, MAGENTA : 240, WHITE : 640}
 
     reload_speed = 4
 
@@ -215,8 +215,8 @@ class MachineGun_Tower(Tower):
 
 class HeavyGun_Tower(Tower): 
 
-    damage_levels = {GREEN : 5, CYAN : 6, BLUE : 7, DARK_BLUE : 8, YELLOW : 9, ORANGE : 10,
-                MAGENTA : 12, WHITE : 14}
+    damage_levels = {GREEN : 100, CYAN : 110, BLUE : 120, DARK_BLUE : 130, YELLOW : 140, ORANGE : 150,
+                MAGENTA : 160, WHITE : 170}
 
     cost_levels = {GREEN : 50, CYAN : 100, BLUE : 150, DARK_BLUE : 200, YELLOW : 300, ORANGE : 400,
                 MAGENTA : 600, WHITE : 800}
@@ -227,7 +227,7 @@ class HeavyGun_Tower(Tower):
     att_range = {GREEN : 240, CYAN : 260, BLUE : 280, DARK_BLUE : 300, YELLOW : 310, ORANGE : 320,
                 MAGENTA : 330, WHITE : 340}
 
-    reload_speed = 4
+    reload_speed = 100
 
     shell_speed = 15
 
