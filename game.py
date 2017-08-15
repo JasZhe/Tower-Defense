@@ -108,6 +108,9 @@ label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_time
     1, (255, 255, 255))
 screen.blit(label, (100, 100))
 
+# UI stuff
+start_button = Button(100, 20, green, myfont, lambda: False)
+
 # Sounds
 rifle_gun = pygame.mixer.Sound(file="sounds/rifle_gun.wav")
 sniper_gun = pygame.mixer.Sound(file="sounds/sniper_gun.wav")

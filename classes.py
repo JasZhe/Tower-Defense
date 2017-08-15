@@ -363,3 +363,15 @@ class HP_Bar:
                 colour = self.colour_low
             pygame.draw.rect(screen, colour, [self.x, self.y, int(self.width * percent), self.height])
 
+
+
+class Button:
+    def __init__(self, width, height, colour, font, on_click):
+        self.width = width
+        self.height = height
+        self.colour = colour
+        self.font = font
+        self.on_click = on_click
+
+    def draw(display, x, y, anchor = None):
+        pygame.draw.rect(display, self.colour, (x, y, width, height))
