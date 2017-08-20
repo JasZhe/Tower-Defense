@@ -77,7 +77,7 @@ class Rifle_Tower(Tower):
     att_range = {GREEN : 140, CYAN : 160, BLUE : 180, DARK_BLUE : 200, YELLOW : 210, ORANGE : 220,
                 MAGENTA : 220, WHITE : 240}
 
-    reload_speed = 30
+    reload_time = 30
 
     shell_speed = 15
 
@@ -86,7 +86,7 @@ class Rifle_Tower(Tower):
         self.max_range = self.att_range[self.type]
         self.damage = self.damage_levels[self.type]
         self.cost = self.cost_levels[self.type]
-        self.reload_speed = self.reload_speed 
+        self.reload_time = self.reload_time 
         self.shell_speed = self.shell_speed
         self.sound = pygame.mixer.Sound(file="sounds/rifle_gun.wav")
 
@@ -98,14 +98,14 @@ class Rifle_Tower(Tower):
         self.body.inflate_ip(self.inflation[self.type])
 
     def canShoot(self):
-        if self.time % self.reload_speed == 0:
+        if self.time % self.reload_time == 0:
             self.time = 0
             return True
         else:
             return False
 
     def dpm(self):
-        return self.damage / self.reload_speed
+        return self.damage / self.reload_time
 
     def shoot(self, enemy, HEIGHT, WIDTH):
         bullet = super(Rifle_Tower, self).shoot(enemy, HEIGHT, WIDTH)
@@ -123,10 +123,10 @@ class Sniper_Tower(Tower):
     inflation = {GREEN : (0, 0), CYAN : (0, 0), BLUE : (10, 10), DARK_BLUE : (0, 0), 
                 YELLOW : (5, 5), ORANGE : (0, 0), MAGENTA : (5, 5), WHITE : (5, 5)}
 
-    att_range = {GREEN : 240, CYAN : 260, BLUE : 280, DARK_BLUE : 300, YELLOW : 310, ORANGE : 320,
-                MAGENTA : 330, WHITE : 640}
+    att_range = {GREEN : 220, CYAN : 240, BLUE : 260, DARK_BLUE : 280, YELLOW : 300, ORANGE : 330,
+                MAGENTA : 350, WHITE : 400}
 
-    reload_speed = 90
+    reload_time = 90
 
     shell_speed = 30
 
@@ -135,7 +135,7 @@ class Sniper_Tower(Tower):
         self.max_range = self.att_range[self.type]
         self.damage = self.damage_levels[self.type]
         self.cost = self.cost_levels[self.type]
-        self.reload_speed = self.reload_speed 
+        self.reload_time = self.reload_time 
         self.shell_speed = self.shell_speed
         self.sound = pygame.mixer.Sound(file="sounds/sniper_gun.wav")
 
@@ -147,14 +147,14 @@ class Sniper_Tower(Tower):
         self.body.inflate_ip(self.inflation[self.type])
 
     def canShoot(self):
-        if self.time % self.reload_speed == 0:
+        if self.time % self.reload_time == 0:
             self.time = 0
             return True
         else:
             return False
 
     def dpm(self):
-        return self.damage / self.reload_speed
+        return self.damage / self.reload_time
 
     
     def shoot(self, enemy, HEIGHT, WIDTH):
@@ -173,7 +173,7 @@ class MachineGun_Tower(Tower):
 
     att_range = {GREEN : 100, CYAN : 120, BLUE : 140, DARK_BLUE : 160, YELLOW : 180, ORANGE : 200, MAGENTA : 240, WHITE : 640}
 
-    reload_speed = 4
+    reload_time = 4
 
     shell_speed = 15
 
@@ -182,7 +182,7 @@ class MachineGun_Tower(Tower):
         self.max_range = self.att_range[self.type]
         self.damage = self.damage_levels[self.type]
         self.cost = self.cost_levels[self.type]
-        self.reload_speed = self.reload_speed 
+        self.reload_time = self.reload_time 
         self.shell_speed = self.shell_speed
         self.sound = pygame.mixer.Sound(file="sounds/machine_gun.wav")
 
@@ -194,14 +194,14 @@ class MachineGun_Tower(Tower):
         self.body.inflate_ip(self.inflation[self.type])
 
     def canShoot(self):
-        if self.time % self.reload_speed == 0:
+        if self.time % self.reload_time == 0:
             self.time = 0
             return True
         else:
             return False
 
     def dpm(self):
-        return self.damage / self.reload_speed
+        return self.damage / self.reload_time
 
     def shoot(self, enemy, HEIGHT, WIDTH):
         bullet = super(MachineGun_Tower, self).shoot(enemy, HEIGHT, WIDTH)
@@ -227,7 +227,7 @@ class HeavyGun_Tower(Tower):
     att_range = {GREEN : 240, CYAN : 260, BLUE : 280, DARK_BLUE : 300, YELLOW : 310, ORANGE : 320,
                 MAGENTA : 330, WHITE : 340}
 
-    reload_speed = 100
+    reload_time = 100
 
     shell_speed = 15
 
@@ -236,7 +236,7 @@ class HeavyGun_Tower(Tower):
         self.max_range = self.att_range[self.type]
         self.damage = self.damage_levels[self.type]
         self.cost = self.cost_levels[self.type]
-        self.reload_speed = self.reload_speed 
+        self.reload_time = self.reload_time 
         self.shell_speed = self.shell_speed
         self.sound = pygame.mixer.Sound(file="sounds/heavy_gun.wav")
 
@@ -248,14 +248,14 @@ class HeavyGun_Tower(Tower):
         self.body.inflate_ip(self.inflation[self.type])
 
     def canShoot(self):
-        if self.time % self.reload_speed == 0:
+        if self.time % self.reload_time == 0:
             self.time = 0
             return True
         else:
             return False
 
     def dpm(self):
-        return self.damage / self.reload_speed
+        return self.damage / self.reload_time
 
 
     def shoot(self, enemy, HEIGHT, WIDTH): 

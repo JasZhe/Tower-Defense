@@ -248,7 +248,7 @@ class Map:
                     return True
         return False
 
-    # checks if a rectangle in on a corner block
+    # checks if a rectangle is on a corner block
     def on_corner (self, rect, tolerance = 2):
         for corner in self.corners:
             if abs(self.to_pixel(corner)[0] - rect.topleft[0]) < tolerance and \
@@ -275,7 +275,7 @@ class Map:
 
 class HP_Bar:
     def __init__(self, max_hp = 100, x = 0, y = 0, width = 200, height = 20, 
-                colour_high = (0, 255, 0), colour_med = (255, 153, 51), colour_low = (255, 51, 51)):
+                colour_high = (0, 255, 0), colour_med = (255, 153, 51), colour_low = (255, 51, 51), colour_back = (0, 0, 0)):
         self.max_hp = max_hp
         self.hp = max_hp
         self.x = x
@@ -285,6 +285,7 @@ class HP_Bar:
         self.colour_high = colour_high
         self.colour_med = colour_med
         self.colour_low = colour_low
+        self.colour_back = colour_back
 
     def increase_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
@@ -314,8 +315,16 @@ class HP_Bar:
     def replenish(self):
         self.set_hp(self.max_hp)
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
+    def draw(self, screen, alt_x = None, alt_y = None):
+        pos_x = self.x
+        pos_y = self.y
+        if alt_x and alt_y:
+            pos_x = alt_x
+            pos_y = alt_y
+
+        print("x:", pos_x)
+        if self.colour_back:
+            pygame.draw.rect(screen, self.colour_back, [pos_x, pos_y, self.width, self.height])
         if not self.is_empty():
             percent = self.percent_hp()
             colour = None
@@ -325,5 +334,6 @@ class HP_Bar:
                 colour = self.colour_med
             else:
                 colour = self.colour_low
-            pygame.draw.rect(screen, colour, [self.x, self.y, int(self.width * percent), self.height])
+            pygame.draw.rect(screen, colour, [pos_x, pos_y, int(self.width * percent), self.height])
+            #print("DREW")
 

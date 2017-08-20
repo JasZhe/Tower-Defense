@@ -56,6 +56,25 @@ from bullets import *
 #       Circle is better * DONE
 
 #*************************************************************
+# DEBUG
+frame_by_frame = True
+# frame_increase (DEBUG)
+def frame_increase():
+    loop = True
+    while loop:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    loop = False
+                    break
+            if event.type == pygame.QUIT: 
+                pygame.quit()
+                sys.exit()
+
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_2]:
+            loop = False
+
 pygame.init() 
 
 # Map settings
@@ -107,6 +126,9 @@ label = myfont.render("Health: %d SpawnRate: %d" % (enemy_initial_hp, spawn_time
     1, (255, 255, 255))
 screen.blit(label, (100, 100))
 
+
+enemy_list.append(Enemy(pygame.Rect((enemy_start[0] - enemy_size[0], enemy_start[1]), enemy_size), RED,
+                                (30, 0), WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp))
 # Main Gameloop
 while True:
     for event in pygame.event.get():
@@ -127,16 +149,17 @@ while True:
 
     # Every clock update the counter will increment by one, when spawn_time
     # ticks have passed an enemy will spawn. 
-    if counter % spawn_time == 0:
-        rand = random.randint(0, 5)
+    # if counter % spawn_time == 0:
+    #     rand = random.randint(0, 5)
+    #     #rand = 5
 
-        if rand == 5:
-            enemy = Shield_Enemy(Enemy(pygame.Rect((enemy_start[0] - enemy_size[0], enemy_start[1]), enemy_size), ORANGE,
-                                enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp))
-        else:
-            enemy = Enemy(pygame.Rect((enemy_start[0] - enemy_size[0], enemy_start[1]), enemy_size), RED,
-                                enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp)
-        enemy_list.append(enemy)
+    #     if rand == 5:
+    #         enemy = Shield_Enemy(pygame.Rect((enemy_start[0] - enemy_size[0], enemy_start[1]), enemy_size), ORANGE,
+    #                             enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp)
+    #     else:
+    #         enemy = Enemy(pygame.Rect((enemy_start[0] - enemy_size[0], enemy_start[1]), enemy_size), RED,
+    #                             enemy_speed, WIDTH, HEIGHT, enemy_initial_hp, enemy_max_hp)
+    #     enemy_list.append(enemy)
 
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_UP]:
@@ -318,6 +341,7 @@ while True:
             if enemy.check_hit(bullet):
                 enemy.damage(bullet)
                 bullet_list.remove(bullet) 
+
         for bullet in tower_bullets:
             if enemy.check_hit(bullet):
                 # AOE weapon
@@ -342,47 +366,25 @@ while True:
             enemy_list.remove(enemy)
         elif enemy.check_destroy():
             enemy_list.remove(enemy)
+        # else:
+        #     corner_check = game_map.on_corner(enemy.body)
+        #     if corner_check:
+        #         enemy.turn(game_map.turn_direction(corner_check))
+        #     enemy.draw(screen)
+        #     enemy.update()
 
     # Draw enemy if still alive at the end of the frame
     for enemy in enemy_list:
-        corner_check = game_map.on_corner(enemy.body)
-        if corner_check:
-            enemy.turn(game_map.turn_direction(corner_check))
-        pygame.draw.rect(screen, enemy.colour, enemy.body)
+        # corner_check = game_map.on_corner(enemy.body)
+        # if corner_check:
+        #     enemy.turn(game_map.turn_direction(corner_check))
 
-
-        # Enemy info
-        # screen.blit(myfont.render("HP: %d/%d" % (enemy.hp, enemy.max_hp), 
-        #     1, (255, 255, 255)), enemy.body.bottomleft)
-
-        # HP Bar
-        color = BLACK
-        if enemy.hp > 0:
-            if enemy.hp > 50:
-                colour = GREEN
-            elif enemy.hp > 30:
-                colour = ORANGE
-            else:
-                colour = RED
-
-        if type(enemy) is Shield_Enemy:
-            pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
-            
-            pygame.draw.rect(screen, colour, 
-                [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
-
-            if enemy.shield_hp > 0:
-                #pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 10, enemy.body.width, 5])
-                pygame.draw.rect(screen, WHITE,
-                    [enemy.body.x, enemy.body.y + enemy.body.height - 10, enemy.body.width * enemy.shield_hp / enemy.max_shield, 5])
-        else:
-            pygame.draw.rect(screen, BLACK, [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width, 5])
-            pygame.draw.rect(screen, colour, 
-                [enemy.body.x, enemy.body.y + enemy.body.height - 5, enemy.body.width * enemy.hp / enemy.max_hp, 5])
-
+        enemy.draw(screen)
         enemy.update()
 
     master_hp.draw(screen)
     pygame.display.update()
+    if frame_by_frame:
+        frame_increase()
     clock.tick(FRAME_RATE)
     counter = counter + 1 

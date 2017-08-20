@@ -2,6 +2,7 @@ import pygame, sys
 from functions import *
 from properties import * 
 from bullets import *
+from classes import HP_Bar
 
 class Enemy(object):
         # Add health 
@@ -12,8 +13,7 @@ class Enemy(object):
             self.colour = colour 
             self.screen_width = screen_width
             self.screen_height = screen_height
-            self.hp = hp
-            self.max_hp = max_hp
+            self.hp_bar = HP_Bar(max_hp, body.x, body.y - 5, body.width, 5)
 
 
         def update(self):
@@ -21,7 +21,7 @@ class Enemy(object):
 
         # Return true if the enemy has left the screen or destroyed
         def check_destroy(self, percent_margin = 0.2):
-            if self.hp <= 0 \
+            if self.hp_bar.is_empty() \
             or self.body.top > self.screen_height * (1 + percent_margin) \
             or self.body.bottom < 0 - self.screen_height * percent_margin \
             or self.body.left > self.screen_width * (1 + percent_margin) \
@@ -31,7 +31,7 @@ class Enemy(object):
                 return False
 
         def breach(self, percent_margin  = 0.2):
-            return self.hp > 0 and self.check_destroy(percent_margin)
+            return not self.hp_bar.is_empty() and self.check_destroy(percent_margin)
 
         # get_direction()
         # returns the direction that the enemy is going
@@ -69,37 +69,47 @@ class Enemy(object):
 
             if type(bullet) is Heavy_Bullet:
                 if distance(bullet.body.center, self.body.center) <= explosion_radius:
-                    self.hp = max(self.hp - bullet.damage * \
-                                1 / (1 + distance(bullet.body.center, self.body.center) /explosion_radius),0)
+                    self.hp_bar.decrease_hp(bullet.damage * \
+                                1 / (1 + distance(bullet.body.center, self.body.center) /explosion_radius))
 
             else:
-                self.hp = max(self.hp - bullet.damage, 0)
+                self.hp_bar.decrease_hp(bullet.damage)
+
+        def draw(self, screen):
+            pygame.draw.rect(screen, self.colour, self.body)
+            print("BODY")
+            self.hp_bar.draw(screen, self.body.x, self.body.bottom - self.hp_bar.height)
+
+        def __str__(self):
+            return "===" + str(self.hp_bar.hp) + "==="
 
 
 class Shield_Enemy(Enemy):
 
-    def __init__(self, enemy, shield_hp = 100):
-            self.body = enemy.body 
-            self.velocity = enemy.velocity # Tuple (v_x, v_y)
-            self.colour = enemy.colour
-            self.screen_width = enemy.screen_width
-            self.screen_height = enemy.screen_height
-            self.hp = enemy.hp
-            self.max_hp = enemy.max_hp
-            self.shield_hp = shield_hp
-            self.max_shield = shield_hp 
+    def __init__(self, body, colour, velocity, screen_width, screen_height, hp, max_hp = 100, shield_hp = 100):
+        super().__init__(body, colour, velocity, screen_width, screen_height, hp, max_hp = 100)
+        self.shield_hp = shield_hp
+        self.max_shield = shield_hp
+        self.shield_bar = HP_Bar(shield_hp, body.x, body.y - 10, body.width, 5, WHITE, WHITE, WHITE, None)
 
     # Shield guys not affected by aoe damage 
     # Shield takes double damage
     # Bring the shield below 0 does not affect regular hp 
     def damage(self, bullet):
-        if self.shield_hp == 0: 
-            super(Shield_Enemy, self).damage(bullet)
+        if self.shield_bar.is_empty(): 
+            super().damage(bullet)
         else: 
             if type(bullet) is Heavy_Bullet:
                 if distance(bullet.body.center, self.body.center) <= 100:
-                        self.shield_hp = max(self.shield_hp - bullet.damage * \
-                                    1 / (1 + distance(bullet.body.center, self.body.center)/60), 0)
+                    self.shield_hp = max(self.shield_hp - bullet.damage * \
+                                1 / (1 + distance(bullet.body.center, self.body.center)/60), 0)
+                    self.shield_bar.decrease_hp(bullet.damage * \
+                                1 / (1 + distance(bullet.body.center, self.body.center)/60))
             else:
-                self.shield_hp = max(self.shield_hp - (2 * bullet.damage), 0)
-        
+                self.shield_bar.decrease_hp(2 * bullet.damage)
+    
+    def draw(self, screen):
+        print("SHIELD")
+        super().draw(screen)
+        self.shield_bar.draw(screen, self.body.x, self.body.bottom - self.hp_bar.height - self.shield_bar.height)
+
